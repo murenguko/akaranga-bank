@@ -1,0 +1,133 @@
+:root {
+  --akaranga-blue: #1F3864;
+  --akaranga-blue-dark: #122240;
+  --akaranga-gold: #C9A227;
+  --akaranga-gold-text: #765D00;
+  --akaranga-gold-light: #E4C158;
+  --akaranga-text: #1a202c;
+  --akaranga-bg-light: #f8fafc;
+}
+
+html {
+  font-size: 16px;
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 70px;
+  color: var(--akaranga-text);
+  background-color: #ffffff;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* Accessibility: Skip Link (WCAG 2.1 AA) */
+.skip-link {
+  position: absolute;
+  top: -120px;
+  left: 15px;
+  background-color: var(--akaranga-blue);
+  color: #ffffff !important;
+  padding: 12px 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  border: 2px solid var(--akaranga-gold);
+  border-radius: 4px;
+  z-index: 10000;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 15px;
+  outline: 3px solid #ffcc00 !important;
+  outline-offset: 3px !important;
+}
+
+/* Accessibility: Visible Focus Indicators (Yellow outline requirement EF-13.11) */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+[tabindex]:focus,
+.form-control:focus,
+.form-select:focus,
+.btn:focus,
+.page-link:focus {
+  outline: 3px solid #ffcc00 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(31, 56, 100, 0.35) !important;
+}
+
+/* Akaranga Bank Brand Styling */
+.navbar-brand {
+  color: var(--akaranga-blue) !important;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background-color: var(--akaranga-blue) !important;
+  border-color: var(--akaranga-blue) !important;
+  color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--akaranga-blue-dark) !important;
+  border-color: var(--akaranga-blue-dark) !important;
+}
+
+.badge-gold {
+  background-color: var(--akaranga-gold);
+  color: var(--akaranga-blue-dark);
+}
+
+/* Accessible Tables */
+table[role="table"] th {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* Print Layout Optimization (CT-15.5 & EF-15.14) */
+@media print {
+  .no-print,
+  header,
+  nav,
+  .navbar,
+  footer,
+  .btn,
+  .pagination,
+  .alert,
+  .modal {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    margin: 0 !important;
+    padding: 10mm !important;
+  }
+
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 8px !important;
+  }
+}

@@ -1,0 +1,2 @@
+@{ ViewData["Title"] = "Risque client"; }
+<h1>Évaluation du risque client</h1><p>Client #@ViewBag.ClientId</p><div class="alert alert-info">Niveau de risque : <strong>@ViewBag.Risque</strong></div><a asp-action="Alertes" class="btn btn-outline-primary">Retour aux alertes</a>

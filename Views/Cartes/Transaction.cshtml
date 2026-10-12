@@ -1,0 +1,67 @@
+@model AkarangaBank.Web.ViewModels.CarteTransactionViewModel
+@{
+    ViewData["Title"] = "Simulation Transaction Carte";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h1 class="h4 mb-0" style="color: #1F3864;"><i class="bi bi-terminal"></i> Terminal Carte Bancaire (DAB / TPE)</h1>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Transaction" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="CarteId" class="form-label fw-semibold"></label>
+                        <select asp-for="CarteId" asp-items="ViewBag.Cartes" class="form-select">
+                            <option value="">-- Sélectionner une carte --</option>
+                        </select>
+                        <span asp-validation-for="CarteId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TypeTransaction" class="form-label fw-semibold"></label>
+                        <select asp-for="TypeTransaction" class="form-select">
+                            <option value="Paiement">Paiement Commerce (TPE)</option>
+                            <option value="Retrait">Retrait DAB (Distributeur)</option>
+                            <option value="PaiementEnLigne">Achat en ligne (E-commerce)</option>
+                        </select>
+                        <span asp-validation-for="TypeTransaction" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Montant" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <input asp-for="Montant" class="form-control" type="number" step="5000" />
+                            <span class="input-group-text">BIF</span>
+                        </div>
+                        <span asp-validation-for="Montant" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Commercant" class="form-label fw-semibold"></label>
+                        <input asp-for="Commercant" class="form-control" placeholder="Ex: Supermarché du Lac, DAB Siège..." />
+                        <span asp-validation-for="Commercant" class="text-danger small"></span>
+                    </div>
+
+                    <div class="alert alert-light border small text-muted">
+                        <i class="bi bi-shield-check"></i> Cette action teste l'ensemble des garde-fous réglementaires : statut de la carte, expiration, solde du compte débité, et vérification des plafonds journaliers.
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary" style="background-color: #1F3864; border-color: #1F3864;">
+                            <i class="bi bi-play-circle"></i> Exécuter la transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

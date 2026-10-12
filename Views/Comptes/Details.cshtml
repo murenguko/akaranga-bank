@@ -1,0 +1,152 @@
+@model AkarangaBank.Web.Models.Compte
+@{
+    ViewData["Title"] = $"Compte {Model.NumeroCompte}";
+}
+
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Compte @Model.NumeroCompte</h1>
+        <p class="text-muted mb-0">Type : <strong>@Model.TypeCompte?.Libelle</strong> | Agence : <strong>@Model.Agence?.Nom (@Model.Agence?.Code)</strong></p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+        {
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Supprimer</a>
+        }
+        <a asp-controller="DocumentsPdf" asp-action="Releve" asp-route-id="@Model.Id" target="_blank" class="btn btn-outline-danger">
+            <i class="bi bi-file-earmark-pdf"></i> Relevé PDF
+        </a>
+        <a asp-controller="DocumentsPdf" asp-action="Attestation" asp-route-id="@Model.Id" target="_blank" class="btn btn-outline-primary">
+            <i class="bi bi-file-earmark-check"></i> Attestation Solde PDF
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Retour à la liste</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-info-circle"></i> Données du Compte</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Titulaire</dt>
+                    <dd class="col-sm-8 fw-semibold">
+                        @if (Model.Client != null)
+                        {
+                            @if (User.IsInRole("admin") || User.IsInRole("gestionnaire"))
+                            {
+                                <a asp-controller="Clients" asp-action="Details" asp-route-id="@Model.ClientId">@Model.Client.Nom @Model.Client.Prenom (@Model.Client.NumeroClient)</a>
+                            }
+                            else
+                            {
+                                <span>@Model.Client.Nom @Model.Client.Prenom (@Model.Client.NumeroClient)</span>
+                            }
+                        }
+                        else
+                        {
+                            <span>Compte interne de trésorerie</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted">Solde Actuel</dt>
+                    <dd class="col-sm-8 h4 text-primary fw-bold mb-2">@Model.Solde.ToString("N2") @Model.Devise</dd>
+
+                    <dt class="col-sm-4 text-muted">Statut</dt>
+                    <dd class="col-sm-8"><span class="badge bg-success">@Model.Statut</span></dd>
+
+                    <dt class="col-sm-4 text-muted">Date d'ouverture</dt>
+                    <dd class="col-sm-8">@Model.DateOuverture.ToString("d")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    @if (User.IsInRole("admin"))
+    {
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-credit-card-2-front"></i> Cartes Bancaires Rattachées</h5>
+                @if (User.IsInRole("admin"))
+                {
+                    <a asp-controller="Cartes" asp-action="Emettre" asp-route-compteId="@Model.Id" class="btn btn-sm btn-outline-primary">+ Émettre une carte</a>
+                }
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                @if (!Model.Cartes.Any())
+                {
+                    <li class="list-group-item text-muted py-3">Aucune carte active sur ce compte.</li>
+                }
+                else
+                {
+                    @foreach (var c in Model.Cartes)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="font-monospace">@c.NumeroMasque</strong>
+                                <span class="badge bg-light text-dark border ms-2">@c.TypeCarte</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-success me-2">@c.Statut</span>
+                                @if (User.IsInRole("admin")) { <a asp-controller="Cartes" asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Gérer</a> }
+                            </div>
+                        </li>
+                    }
+                }
+                </ul>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-journal-text"></i> Dernières Écritures Comptables</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Écritures comptables">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Écritures comptables</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Libellé</th>
+                        <th scope="col">Opération</th>
+                        <th scope="col" class="text-end">Débit</th>
+                        <th scope="col" class="text-end">Crédit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Ecritures.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Aucune écriture comptable enregistrée.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var e in Model.Ecritures)
+                    {
+                        <tr>
+                            <td>@e.DateEcriture.ToString("g")</td>
+                            <td>@e.Libelle</td>
+                            <td><small class="font-monospace">@(e.Operation?.Reference ?? "-")</small></td>
+                            <td class="text-end text-danger fw-semibold">@(e.Sens == "Debit" ? $"{e.Montant:N2} {e.Devise}" : "")</td>
+                            <td class="text-end text-success fw-semibold">@(e.Sens == "Credit" ? $"{e.Montant:N2} {e.Devise}" : "")</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

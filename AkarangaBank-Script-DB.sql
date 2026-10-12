@@ -1,0 +1,565 @@
+-- 1. Création de la base de données
+-- ============================================================
+-- AKARANGA BANK — SCRIPT DE CRÉATION
+-- SGBD : SQL Server
+-- Encodage : UTF-8
+-- ============================================================
+IF DB_ID('AkarangaBank') IS NOT NULL
+ DROP DATABASE AkarangaBank;
+GO
+CREATE DATABASE AkarangaBank;
+GO
+USE AkarangaBank;
+GO
+
+-- 2. Référentiel : Agences, Utilisateurs, Parametres
+-- ============================================================
+-- 1. RÉFÉRENTIEL
+-- ============================================================
+CREATE TABLE Agences (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ Code NVARCHAR(20) NOT NULL UNIQUE,
+ Nom NVARCHAR(100) NOT NULL,
+ Ville NVARCHAR(50) NOT NULL,
+ EstSiege BIT NOT NULL CONSTRAINT DF_Agences_EstSiege
+DEFAULT 0,
+ DateCreation DATETIME2 NOT NULL CONSTRAINT DF_Agences_DateCreation
+DEFAULT SYSDATETIME(),
+ DateModification DATETIME2 NULL
+);
+GO
+
+CREATE TABLE Parametres (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ Cle NVARCHAR(50) NOT NULL,
+ Valeur NVARCHAR(255) NOT NULL,
+ Description NVARCHAR(255) NULL, 
+ AgenceId INT NULL,
+ DateModification DATETIME2 NOT NULL CONSTRAINT
+DF_Parametres_DateModification DEFAULT SYSDATETIME(),
+ CONSTRAINT UQ_Parametres_Cle_Agence UNIQUE (Cle, AgenceId),
+ CONSTRAINT FK_Parametres_Agences
+ FOREIGN KEY (AgenceId) REFERENCES Agences(Id)
+);
+GO
+
+
+-- 3. Clients et KYC
+-- ============================================================
+-- 2. CLIENTS ET KYC
+-- ============================================================
+CREATE TABLE Clients (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ NumeroClient NVARCHAR(20) NOT NULL UNIQUE,
+ Nom NVARCHAR(100) NOT NULL,
+ Prenom NVARCHAR(100) NOT NULL,
+ DateNaissance DATE NOT NULL,
+ NumeroCNI NVARCHAR(30) NOT NULL UNIQUE,
+ Telephone NVARCHAR(20) NULL,
+ Email NVARCHAR(100) NULL,
+ Adresse NVARCHAR(255) NULL,
+ AgenceId INT NOT NULL,
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_Clients_Statut
+DEFAULT 'Actif',
+ DateCreation DATETIME2 NOT NULL CONSTRAINT DF_Clients_DateCreation
+DEFAULT SYSDATETIME(),
+ DateModification DATETIME2 NULL,
+ CONSTRAINT CK_Clients_Statut
+ CHECK (Statut IN ('Actif', 'Suspendu', 'Cloture')),
+ CONSTRAINT FK_Clients_Agences
+ FOREIGN KEY (AgenceId) REFERENCES Agences(Id)
+);
+GO
+CREATE TABLE VerificationsKYC (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ ClientId INT NOT NULL,
+ TypeDocument NVARCHAR(50) NOT NULL,
+ NumeroDocument NVARCHAR(50) NOT NULL,
+ CheminDocument NVARCHAR(500) NULL,
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_KYC_Statut DEFAULT
+'EnAttente',
+ VerifieParId INT NULL,
+ DateVerification DATETIME2 NULL,
+ Commentaire NVARCHAR(500) NULL,
+ CONSTRAINT CK_KYC_Statut 
+ CHECK (Statut IN ('EnAttente', 'Valide', 'Rejete', 'Expire')),
+ CONSTRAINT FK_KYC_Clients
+ FOREIGN KEY (ClientId) REFERENCES Clients(Id),
+ CONSTRAINT FK_KYC_Utilisateurs
+ FOREIGN KEY (VerifieParId) REFERENCES Utilisateurs(Id)
+);
+GO
+-- 4. Comptes et Cartes
+-- ============================================================
+-- 3. COMPTES ET CARTES
+-- ============================================================
+CREATE TABLE TypesCompte (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ Code NVARCHAR(20) NOT NULL UNIQUE,
+ Libelle NVARCHAR(50) NOT NULL,
+ TauxInteret DECIMAL(5,2) NOT NULL CONSTRAINT DF_TypesCompte_Taux
+DEFAULT 0,
+ SoldeMinimum DECIMAL(18,2) NOT NULL CONSTRAINT DF_TypesCompte_SoldeMin
+DEFAULT 0,
+ AutoriseDecouvert BIT NOT NULL CONSTRAINT
+DF_TypesCompte_Decouvert DEFAULT 0,
+ DateCreation DATETIME2 NOT NULL CONSTRAINT
+DF_TypesCompte_DateCreation DEFAULT SYSDATETIME(),
+ CONSTRAINT CK_TypesCompte_Taux
+ CHECK (TauxInteret >= 0 AND TauxInteret <= 100),
+ CONSTRAINT CK_TypesCompte_SoldeMin
+ CHECK (SoldeMinimum >= 0)
+);
+GO
+CREATE TABLE Comptes (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ NumeroCompte NVARCHAR(30) NOT NULL UNIQUE,
+ ClientId INT NOT NULL,
+ TypeCompteId INT NOT NULL,
+ AgenceId INT NOT NULL,
+ Solde DECIMAL(18,2) NOT NULL CONSTRAINT DF_Comptes_Solde DEFAULT
+0,
+ Devise NVARCHAR(3) NOT NULL CONSTRAINT DF_Comptes_Devise
+DEFAULT 'BIF',
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_Comptes_Statut
+DEFAULT 'Actif',
+ DateOuverture DATETIME2 NOT NULL CONSTRAINT DF_Comptes_DateOuverture
+DEFAULT SYSDATETIME(),
+ DateFermeture DATETIME2 NULL,
+ DateCreation DATETIME2 NOT NULL CONSTRAINT DF_Comptes_DateCreation
+DEFAULT SYSDATETIME(), 
+ateModification DATETIME2 NULL,
+ CONSTRAINT CK_Comptes_Statut
+ CHECK (Statut IN ('Actif', 'Bloque', 'Cloture')),
+ CONSTRAINT FK_Comptes_Clients
+ FOREIGN KEY (ClientId) REFERENCES Clients(Id),
+ CONSTRAINT FK_Comptes_TypesCompte
+ FOREIGN KEY (TypeCompteId) REFERENCES TypesCompte(Id),
+ CONSTRAINT FK_Comptes_Agences
+ FOREIGN KEY (AgenceId) REFERENCES Agences(Id)
+);
+GO
+CREATE TABLE Cartes (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ NumeroCarte NVARCHAR(20) NOT NULL UNIQUE,
+ CompteId INT NOT NULL,
+ ClientId INT NOT NULL,
+ TypeCarte NVARCHAR(20) NOT NULL,
+ DateExpiration DATE NOT NULL,
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_Cartes_Statut DEFAULT
+'Active',
+ DateCreation DATETIME2 NOT NULL CONSTRAINT DF_Cartes_DateCreation
+DEFAULT SYSDATETIME(),
+ CONSTRAINT CK_Cartes_Type
+ CHECK (TypeCarte IN ('Visa', 'MasterCard', 'Locale')),
+ CONSTRAINT CK_Cartes_Statut
+ CHECK (Statut IN ('Active', 'Bloquee', 'Expiree')),
+ CONSTRAINT FK_Cartes_Comptes
+ FOREIGN KEY (CompteId) REFERENCES Comptes(Id),
+ CONSTRAINT FK_Cartes_Clients
+ FOREIGN KEY (ClientId) REFERENCES Clients(Id)
+);
+GO
+
+
+
+-- 5. Prêts et Échéances
+-- ============================================================
+-- 4. PRÊTS ET ÉCHÉANCES
+-- ============================================================
+CREATE TABLE Prets (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ Reference NVARCHAR(30) NOT NULL UNIQUE,
+ ClientId INT NOT NULL,
+ CompteDebitId INT NOT NULL,
+ ValideParId INT NULL,
+ MontantPrincipal DECIMAL(18,2) NOT NULL,
+ TauxInteret DECIMAL(5,2) NOT NULL,
+ DureeMois INT NOT NULL,
+ Mensualite DECIMAL(18,2) NOT NULL,
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_Prets_Statut DEFAULT
+'EnAttente',
+ DateDemande DATETIME2 NOT NULL CONSTRAINT DF_Prets_DateDemande
+DEFAULT SYSDATETIME(),
+ DateValidation DATETIME2 NULL,
+ DateDebut DATETIME2 NULL,
+ DateFin DATETIME2 NULL,
+ CONSTRAINT CK_Prets_Montant
+ CHECK (MontantPrincipal > 0),
+ CONSTRAINT CK_Prets_Taux
+ CHECK (TauxInteret >= 0 AND TauxInteret <= 100),
+ CONSTRAINT CK_Prets_Duree
+ CHECK (DureeMois > 0),
+ CONSTRAINT CK_Prets_Mensualite
+ CHECK (Mensualite > 0),
+ CONSTRAINT CK_Prets_Statut
+ CHECK (Statut IN ('EnAttente', 'Valide', 'Rejete', 'EnCours', 'Solde',
+'Impaye')),
+ CONSTRAINT FK_Prets_Clients
+ FOREIGN KEY (ClientId) REFERENCES Clients(Id),
+ CONSTRAINT FK_Prets_Comptes
+ FOREIGN KEY (CompteDebitId) REFERENCES Comptes(Id),
+ CONSTRAINT FK_Prets_Utilisateurs
+ FOREIGN KEY (ValideParId) REFERENCES Utilisateurs(Id)
+);
+GO
+
+CREATE TABLE EcheancesPret (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ PretId INT NOT NULL,
+ NumeroEcheance INT NOT NULL,
+ Capital DECIMAL(18,2) NOT NULL,
+ Interet DECIMAL(18,2) NOT NULL,
+ MontantTotal DECIMAL(18,2) NOT NULL,
+ DateEcheance DATETIME2 NOT NULL,
+ DatePaiement DATETIME2 NULL,
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_Echeances_Statut
+DEFAULT 'EnAttente',
+ CONSTRAINT UQ_Echeance_Pret_Numero UNIQUE (PretId, NumeroEcheance),
+ CONSTRAINT CK_Echeances_Capital
+ CHECK (Capital >= 0),
+ CONSTRAINT CK_Echeances_Interet
+ CHECK (Interet >= 0),
+ CONSTRAINT CK_Echeances_MontantTotal
+ CHECK (MontantTotal > 0),
+ CONSTRAINT CK_Echeances_Statut
+ CHECK (Statut IN ('EnAttente', 'Payee', 'EnRetard', 'Annulee')),
+ CONSTRAINT FK_Echeances_Prets
+ FOREIGN KEY (PretId) REFERENCES Prets(Id)
+); 
+GO
+
+
+-- 6. Virements, Opérations et Écritures (comptabilité en partie double)
+-- ============================================================
+-- 5. VIREMENTS, OPÉRATIONS ET ÉCRITURES
+-- ============================================================
+CREATE TABLE Virements (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ Reference NVARCHAR(30) NOT NULL UNIQUE,
+ CompteSourceId INT NOT NULL,
+ CompteDestinationId INT NOT NULL,
+ UtilisateurId INT NOT NULL,
+ Montant DECIMAL(18,2) NOT NULL,
+ Devise NVARCHAR(3) NOT NULL CONSTRAINT DF_Virements_Devise
+DEFAULT 'BIF',
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_Virements_Statut
+DEFAULT 'EnAttente',
+ Motif NVARCHAR(255) NULL,
+ ControleAML BIT NOT NULL CONSTRAINT DF_Virements_AML
+DEFAULT 0,
+ DateVirement DATETIME2 NOT NULL CONSTRAINT DF_Virements_Date
+DEFAULT SYSDATETIME(),
+ DateValidation DATETIME2 NULL,
+ CONSTRAINT CK_Virements_Montant
+ CHECK (Montant > 0),
+ CONSTRAINT CK_Virements_Comptes_Differents
+ CHECK (CompteSourceId <> CompteDestinationId),
+ CONSTRAINT CK_Virements_Statut
+ CHECK (Statut IN ('EnAttente', 'Valide', 'Rejete', 'Annule')),
+ CONSTRAINT FK_Virements_CompteSource
+ FOREIGN KEY (CompteSourceId) REFERENCES Comptes(Id),
+ CONSTRAINT FK_Virements_CompteDestination
+ FOREIGN KEY (CompteDestinationId) REFERENCES Comptes(Id),
+ CONSTRAINT FK_Virements_Utilisateurs
+ FOREIGN KEY (UtilisateurId) REFERENCES Utilisateurs(Id)
+);
+GO
+CREATE TABLE Operations (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ Reference NVARCHAR(30) NOT NULL UNIQUE,
+ TypeOperation NVARCHAR(30) NOT NULL,
+ CompteId INT NOT NULL,
+ UtilisateurId INT NOT NULL,
+ AgenceId INT NOT NULL,
+ VirementId INT NULL,
+ PretId INT NULL,
+ Montant DECIMAL(18,2) NOT NULL,
+ Devise NVARCHAR(3) NOT NULL CONSTRAINT DF_Operations_Devise
+DEFAULT 'BIF',
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_Operations_Statut
+DEFAULT 'EnAttente',
+ DateOperation DATETIME2 NOT NULL CONSTRAINT DF_Operations_Date
+DEFAULT SYSDATETIME(),
+ DateValidation DATETIME2 NULL,
+ Commentaire NVARCHAR(255) NULL,
+ DateCreation DATETIME2 NOT NULL CONSTRAINT
+DF_Operations_DateCreation DEFAULT SYSDATETIME(),
+ CONSTRAINT CK_Operations_Type
+ CHECK (TypeOperation IN ('Depot', 'Retrait', 'Virement',
+'DeblocagePret',
+ 'RemboursementPret', 'Frais', 'Interet')),
+ CONSTRAINT CK_Operations_Montant
+ CHECK (Montant > 0),
+ CONSTRAINT CK_Operations_Statut
+ CHECK (Statut IN ('EnAttente', 'Valide', 'Rejete', 'Annule')),
+ CONSTRAINT FK_Operations_Comptes
+ FOREIGN KEY (CompteId) REFERENCES Comptes(Id),
+ CONSTRAINT FK_Operations_Utilisateurs
+ FOREIGN KEY (UtilisateurId) REFERENCES Utilisateurs(Id),
+ CONSTRAINT FK_Operations_Agences
+ FOREIGN KEY (AgenceId) REFERENCES Agences(Id),
+ CONSTRAINT FK_Operations_Virements
+ FOREIGN KEY (VirementId) REFERENCES Virements(Id),
+ CONSTRAINT FK_Operations_Prets
+ FOREIGN KEY (PretId) REFERENCES Prets(Id)
+);
+GO
+CREATE TABLE Ecritures (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ OperationId INT NOT NULL,
+ CompteId INT NOT NULL,
+ Sens NVARCHAR(10) NOT NULL,
+ Montant DECIMAL(18,2) NOT NULL,
+ Devise NVARCHAR(3) NOT NULL CONSTRAINT DF_Ecritures_Devise DEFAULT
+'BIF',
+ DateEcriture DATETIME2 NOT NULL CONSTRAINT DF_Ecritures_Date DEFAULT
+SYSDATETIME(),
+ Libelle NVARCHAR(255) NULL,
+ CONSTRAINT CK_Ecritures_Sens
+ CHECK (Sens IN ('Debit', 'Credit')),
+ CONSTRAINT CK_Ecritures_Montant
+ CHECK (Montant > 0),
+ CONSTRAINT FK_Ecritures_Operations
+ FOREIGN KEY (OperationId) REFERENCES Operations(Id),
+ CONSTRAINT FK_Ecritures_Comptes
+ FOREIGN KEY (CompteId) REFERENCES Comptes(Id)
+ );
+GO
+-- 7. Audit, AML et Sessions
+-- ============================================================
+-- 6. AUDIT, AML ET SESSIONS
+-- ============================================================
+CREATE TABLE AuditLog (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ DateEvenement DATETIME2 NOT NULL CONSTRAINT DF_AuditLog_Date DEFAULT
+SYSDATETIME(),
+ UtilisateurId INT NULL,
+ AgenceId INT NULL,
+ Action NVARCHAR(50) NOT NULL,
+ TableConcernee NVARCHAR(50) NULL,
+ EnregistrementId INT NULL,
+ ValeurAvant NVARCHAR(MAX) NULL,
+ ValeurApres NVARCHAR(MAX) NULL,
+ AdresseIP NVARCHAR(45) NULL,
+ UserAgent NVARCHAR(255) NULL,
+ Details NVARCHAR(MAX) NULL,
+ CONSTRAINT FK_AuditLog_Utilisateurs
+ FOREIGN KEY (UtilisateurId) REFERENCES Utilisateurs(Id),
+ CONSTRAINT FK_AuditLog_Agences
+ FOREIGN KEY (AgenceId) REFERENCES Agences(Id)
+);
+GO
+CREATE TABLE AlertesAML (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ ClientId INT NOT NULL,
+ OperationId INT NULL,
+ TypeAlerte NVARCHAR(50) NOT NULL,
+ Niveau NVARCHAR(20) NOT NULL,
+ Description NVARCHAR(500) NULL,
+ Statut NVARCHAR(20) NOT NULL CONSTRAINT DF_AlertesAML_Statut
+DEFAULT 'Ouverte',
+ TraiteParId INT NULL,
+ DateAlerte DATETIME2 NOT NULL CONSTRAINT DF_AlertesAML_Date DEFAULT
+SYSDATETIME(),
+ DateTraitement DATETIME2 NULL,
+ CONSTRAINT CK_AlertesAML_Niveau
+ CHECK (Niveau IN ('Faible', 'Moyen', 'Eleve', 'Critique')),
+ CONSTRAINT CK_AlertesAML_Statut
+ CHECK (Statut IN ('Ouverte', 'EnCours', 'Traitee', 'Classee')),
+ CONSTRAINT FK_AlertesAML_Clients
+ FOREIGN KEY (ClientId) REFERENCES Clients(Id),
+ CONSTRAINT FK_AlertesAML_Operations 
+ FOREIGN KEY (OperationId) REFERENCES Operations(Id),
+ CONSTRAINT FK_AlertesAML_Utilisateurs
+ FOREIGN KEY (TraiteParId) REFERENCES Utilisateurs(Id)
+);
+GO
+CREATE TABLE SessionsUtilisateur (
+ Id INT IDENTITY(1,1) PRIMARY KEY,
+ UtilisateurId INT NOT NULL,
+ Token NVARCHAR(255) NOT NULL UNIQUE,
+ AdresseIP NVARCHAR(45) NULL,
+ UserAgent NVARCHAR(255) NULL,
+ DeuxFA_Valide BIT NOT NULL CONSTRAINT DF_Sessions_2FA DEFAULT
+0,
+ DateConnexion DATETIME2 NOT NULL CONSTRAINT
+DF_Sessions_DateConnexion DEFAULT SYSDATETIME(),
+ DateExpiration DATETIME2 NOT NULL,
+ EstActive BIT NOT NULL CONSTRAINT DF_Sessions_EstActive
+DEFAULT 1,
+ CONSTRAINT FK_Sessions_Utilisateurs
+ FOREIGN KEY (UtilisateurId) REFERENCES Utilisateurs(Id)
+);
+GO
+
+
+-- 8. Index pour performances
+-- ============================================================
+-- 7. INDEX
+-- ============================================================
+CREATE INDEX IX_Utilisateurs_AgenceId ON Utilisateurs(AgenceId);
+CREATE INDEX IX_Utilisateurs_Role ON Utilisateurs(Role);
+CREATE INDEX IX_Clients_AgenceId ON Clients(AgenceId);
+CREATE INDEX IX_Clients_NumeroCNI ON Clients(NumeroCNI);
+CREATE INDEX IX_Comptes_ClientId ON Comptes(ClientId);
+CREATE INDEX IX_Comptes_AgenceId ON Comptes(AgenceId);
+CREATE INDEX IX_Comptes_TypeCompteId ON Comptes(TypeCompteId);
+CREATE INDEX IX_Cartes_CompteId ON Cartes(CompteId);
+CREATE INDEX IX_Cartes_ClientId ON Cartes(ClientId);
+CREATE INDEX IX_Virements_CompteSourceId ON Virements(CompteSourceId);
+CREATE INDEX IX_Virements_CompteDestinationId ON
+Virements(CompteDestinationId);
+CREATE INDEX IX_Virements_Statut ON Virements(Statut);
+CREATE INDEX IX_Operations_CompteId ON Operations(CompteId);
+CREATE INDEX IX_Operations_UtilisateurId ON Operations(UtilisateurId);
+CREATE INDEX IX_Operations_AgenceId ON Operations(AgenceId);
+CREATE INDEX IX_Operations_DateOperation ON Operations(DateOperation);
+CREATE INDEX IX_Operations_Statut ON Operations(Statut);
+CREATE INDEX IX_Ecritures_OperationId ON Ecritures(OperationId);
+CREATE INDEX IX_Ecritures_CompteId ON Ecritures(CompteId); 
+CREATE INDEX IX_Prets_ClientId ON Prets(ClientId);
+CREATE INDEX IX_Prets_Statut ON Prets(Statut);
+CREATE INDEX IX_EcheancesPret_PretId ON EcheancesPret(PretId);
+CREATE INDEX IX_EcheancesPret_DateEcheance ON EcheancesPret(DateEcheance);
+CREATE INDEX IX_AuditLog_DateEvenement ON AuditLog(DateEvenement);
+CREATE INDEX IX_AuditLog_UtilisateurId ON AuditLog(UtilisateurId);
+CREATE INDEX IX_AlertesAML_Statut ON AlertesAML(Statut);
+CREATE INDEX IX_AlertesAML_ClientId ON AlertesAML(ClientId);
+CREATE INDEX IX_Sessions_UtilisateurId ON
+SessionsUtilisateur(UtilisateurId);
+CREATE INDEX IX_Sessions_Token ON SessionsUtilisateur(Token);
+GO
+
+
+
+-- 9. Jeu de données de test
+-- ============================================================
+-- 8. DONNÉES DE TEST
+-- ============================================================
+-- 8.1. Agences
+INSERT INTO Agences (Code, Nom, Ville, EstSiege) VALUES
+('AKR-BJM', 'Akaranga Bank Bujumbura (Siège)', 'Bujumbura', 1),
+('AKR-GIT', 'Akaranga Bank Gitega', 'Gitega', 0),
+('AKR-NGO', 'Akaranga Bank Ngozi', 'Ngozi', 0),
+('AKR-RUM', 'Akaranga Bank Rumonge', 'Rumonge', 0);
+GO
+-- 8.2. Types de compte
+INSERT INTO TypesCompte (Code, Libelle, TauxInteret, SoldeMinimum,
+AutoriseDecouvert) VALUES
+('COURANT', 'Compte Courant', 0.00, 0.00, 0),
+('EPARGNE', 'Compte Épargne', 3.50, 10000.00, 0),
+('CREDIT', 'Compte Crédit', 12.00, 0.00, 1);
+GO
+-- 8.3. Paramètres système
+INSERT INTO Parametres (Cle, Valeur, Description) VALUES
+('SEUIL_AML', '5000000', 'Seuil de vigilance anti-blanchiment
+(BIF)'),
+('TAUX_EPARGNE_DEFAUT', '3.50', 'Taux épargne par défaut (%)'),
+('DUREE_SESSION_MIN', '30', 'Durée de session en minutes'),
+('MAX_TENTATIVES_CONNEXION', '3', 'Nombre max de tentatives avant
+blocage'),
+('DEVISE_DEFAUT', 'BIF', 'Devise par défaut de l''application');
+GO
+-- 8.4. Utilisateurs (personnel bancaire)
+-- NB : les mots de passe doivent être hashés en production (ex. BCrypt,
+Argon2).
+-- Ici, valeurs fictives pour les tests.
+
+-- 8.5. Clients
+INSERT INTO Clients (NumeroClient, Nom, Prenom, DateNaissance, NumeroCNI,
+Telephone, Email, AgenceId) VALUES
+('CLI-000001', 'Nshimirimana', 'Emmanuel', '1985-03-12', 'BJM-1234567',
+'+25779123456', 'emmanuel.n@example.bi', 1),
+('CLI-000002', 'Nduwimana', 'Marie', '1990-07-25', 'BJM-2345678',
+'+25779234567', 'marie.n@example.bi', 1),
+('CLI-000003', 'Hategekimana', 'Joseph', '1978-11-08', 'GIT-3456789',
+'+25779345678', 'joseph.h@example.bi', 2),
+('CLI-000004', 'Nkeshimana', 'Béatrice', '1995-01-30', 'NGO-4567890',
+'+25779456789', 'beatrice.n@example.bi', 3),
+('CLI-000005', 'Irakoze', 'Patrick', '1982-05-14', 'RUM-5678901',
+'+25779567890', 'patrick.i@example.bi', 4);
+GO
+-- 8.6. Comptes
+INSERT INTO Comptes (NumeroCompte, ClientId, TypeCompteId, AgenceId, Solde,
+Statut) VALUES
+('BJM-0001-0001', 1, 1, 1, 150000.00, 'Actif'),
+('BJM-0001-0002', 1, 2, 1, 1250000.00, 'Actif'),
+('BJM-0002-0001', 2, 2, 1, 8500000.00, 'Actif'),
+('GIT-0003-0001', 3, 1, 2, 250000.00, 'Actif'),
+('NGO-0004-0001', 4, 3, 3, 25000000.00, 'Actif'),
+('RUM-0005-0001', 5, 2, 4, 500000.00, 'Actif');
+GO
+-- 8.7. Cartes bancaires
+INSERT INTO Cartes (NumeroCarte, CompteId, ClientId, TypeCarte, DateExpiration,
+Statut) VALUES
+('4111111111111111', 2, 1, 'Visa', '2028-12-31', 'Active'),
+('5500000000000004', 3, 2, 'MasterCard', '2027-06-30', 'Active'),
+('4111111111111112', 5, 4, 'Visa', '2029-03-31', 'Active');
+GO
+
+-- 8.8. Vérifications KYC
+INSERT INTO VerificationsKYC (ClientId, TypeDocument, NumeroDocument, Statut,
+VerifieParId, DateVerification) VALUES
+(1, 'CNI', 'BJM-1234567', 'Valide', 2, SYSDATETIME()),
+(2, 'CNI', 'BJM-2345678', 'Valide', 2, SYSDATETIME()),
+(3, 'CNI', 'GIT-3456789', 'Valide', 2, SYSDATETIME()),
+(4, 'CNI', 'NGO-4567890', 'Valide', 2, SYSDATETIME()),
+(5, 'CNI', 'RUM-5678901', 'EnAttente', NULL, NULL);
+GO
+
+-- 8.9. Exemple de virement avec ses écritures (comptabilité en partie double)
+-- Virement de 50 000 BIF du compte 1 vers le compte 2
+INSERT INTO Virements (Reference, CompteSourceId, CompteDestinationId,
+UtilisateurId, Montant, Statut, Motif, DateValidation)
+VALUES ('AKR-20260415-000001', 1, 2, 3, 50000.00, 'Valide', 'Virement test',
+SYSDATETIME());
+GO
+DECLARE @VirementId INT = SCOPE_IDENTITY();
+-- Opération métier correspondante
+INSERT INTO Operations (Reference, TypeOperation, CompteId, UtilisateurId,
+AgenceId, VirementId, Montant, Statut, DateValidation)
+VALUES ('AKR-20260415-000001', 'Virement', 1, 3, 1, @VirementId, 50000.00,
+'Valide', SYSDATETIME());
+GO
+DECLARE @OperationId INT = SCOPE_IDENTITY();
+-- Écritures comptables (débit + crédit = 0)
+INSERT INTO Ecritures (OperationId, CompteId, Sens, Montant, Libelle) VALUES
+(@OperationId, 1, 'Debit', 50000.00, 'Virement sortant vers BJM-0001-0002'),
+(@OperationId, 2, 'Credit', 50000.00, 'Virement entrant depuis BJM-0001-0001');
+GO
+-- 10. Vérification finale
+-- ============================================================
+-- 9. VÉRIFICATION
+-- ============================================================
+PRINT '=== Nombre d''enregistrements par table ===';
+SELECT 'Agences' AS TableName, COUNT(*) AS Nb FROM Agences
+UNION ALL SELECT 'Utilisateurs', COUNT(*) FROM Utilisateurs
+UNION ALL SELECT 'Parametres', COUNT(*) FROM Parametres
+UNION ALL SELECT 'Clients', COUNT(*) FROM Clients
+UNION ALL SELECT 'VerificationsKYC', COUNT(*) FROM VerificationsKYC
+UNION ALL SELECT 'TypesCompte', COUNT(*) FROM TypesCompte
+UNION ALL SELECT 'Comptes', COUNT(*) FROM Comptes
+UNION ALL SELECT 'Cartes', COUNT(*) FROM Cartes
+UNION ALL SELECT 'Virements', COUNT(*) FROM Virements
+UNION ALL SELECT 'Operations', COUNT(*) FROM Operations
+UNION ALL SELECT 'Ecritures', COUNT(*) FROM Ecritures 
+UNION ALL SELECT 'Prets', COUNT(*) FROM Prets
+UNION ALL SELECT 'EcheancesPret', COUNT(*) FROM EcheancesPret
+UNION ALL SELECT 'AuditLog', COUNT(*) FROM AuditLog
+UNION ALL SELECT 'AlertesAML', COUNT(*) FROM AlertesAML
+UNION ALL SELECT 'SessionsUtilisateur', COUNT(*) FROM SessionsUtilisateur;
+GO
+-- Vérification de l'équilibre débit/crédit
+PRINT '=== Contrôle de l''équilibre comptable ===';
+SELECT
+ OperationId,
+ SUM(CASE WHEN Sens = 'Debit' THEN Montant ELSE 0 END) AS TotalDebit,
+ SUM(CASE WHEN Sens = 'Credit' THEN Montant ELSE 0 END) AS TotalCredit,
+ SUM(CASE WHEN Sens = 'Debit' THEN Montant ELSE -Montant END) AS Solde
+FROM Ecritures
+GROUP BY OperationId
+HAVING SUM(CASE WHEN Sens = 'Debit' THEN Montant ELSE -Montant END) <> 0;
+-- Doit ne retourner aucune ligne si la comptabilité est équilibrée
+GO
+

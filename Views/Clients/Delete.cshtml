@@ -1,0 +1,13 @@
+@model AkarangaBank.Web.Models.Client
+@{
+    ViewData["Title"] = "Supprimer le client";
+}
+
+<h1>Supprimer le client</h1>
+<p>Confirmez la suppression de <strong>@Model.Nom @Model.Prenom</strong> (@Model.NumeroClient).</p>
+<p class="text-muted">Un client lié à un compte ou à un utilisateur ne peut pas être supprimé.</p>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    <button type="submit" class="btn btn-danger">Supprimer</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Annuler</a>
+</form>

@@ -1,0 +1,5 @@
+@model AkarangaBank.Web.ViewModels.ReleveViewModel
+@{ ViewData["Title"] = "Relevé de compte"; }
+<h1>Relevé de compte</h1><p><strong>Compte :</strong> @Model.Compte.NumeroCompte &nbsp; <strong>Client :</strong> @Model.Compte.Client?.Nom @Model.Compte.Client?.Prenom</p><p><strong>Solde initial :</strong> @Model.SoldeInitial.ToString("N2") @Model.Compte.Devise &nbsp; <strong>Solde actuel :</strong> @Model.SoldeFinal.ToString("N2") @Model.Compte.Devise</p>
+<table class="table table-striped">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Date, Référence, Libellé, Débit, Crédit</caption><thead><tr><th scope="col">Date</th><th scope="col">Référence</th><th scope="col">Libellé</th><th scope="col">Débit</th><th scope="col">Crédit</th></tr></thead><tbody>@foreach(var e in Model.Ecritures){<tr><td>@e.DateEcriture.ToLocalTime().ToString("g")</td><td>@e.Operation.Reference</td><td>@e.Libelle</td><td>@(e.Sens=="Debit"?e.Montant.ToString("N2"):"")</td><td>@(e.Sens=="Credit"?e.Montant.ToString("N2"):"")</td></tr>}</tbody></table>

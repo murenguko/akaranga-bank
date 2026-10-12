@@ -1,0 +1,83 @@
+@model AkarangaBank.Web.ViewModels.BalanceGeneraleViewModel
+@{
+    ViewData["Title"] = "Balance Générale des Comptes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Balance Générale des Comptes</h1>
+        <p class="text-muted mb-0">Contrôle de l'équilibre comptable par compte en partie double.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="ExportExcelBalance" class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-excel"></i> Exporter Excel
+        </a>
+        <button onclick="window.print();" class="btn btn-outline-primary">
+            <i class="bi bi-printer"></i> Imprimer
+        </button>
+        <a asp-action="Dashboard" class="btn btn-outline-secondary">Retour au tableau de bord</a>
+    </div>
+</div>
+
+@if (Model.EstEquilibree)
+{
+    <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+        <div>
+            <strong>Équilibre Comptable Conforme :</strong> Le total des débits (@Model.TotalDebitsGlobal.ToString("N2") BIF) est strictement égal au total des crédits (@Model.TotalCreditsGlobal.ToString("N2") BIF).
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+        <div>
+            <strong>Déséquilibre Comptable Détecté :</strong> Débits (@Model.TotalDebitsGlobal.ToString("N2") BIF) &ne; Crédits (@Model.TotalCreditsGlobal.ToString("N2") BIF).
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0" role="table" aria-label="Balance générale des comptes">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Balance générale des comptes</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Numéro Compte</th>
+                        <th scope="col">Intitulé / Client</th>
+                        <th scope="col">Agence</th>
+                        <th scope="col" class="text-end">Total Débits</th>
+                        <th scope="col" class="text-end">Total Crédits</th>
+                        <th scope="col" class="text-end">Solde Débiteur</th>
+                        <th scope="col" class="text-end">Solde Créditeur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var l in Model.Lignes)
+                {
+                    <tr>
+                        <td class="font-monospace fw-bold">@l.NumeroCompte</td>
+                        <td>@l.Intitule</td>
+                        <td><span class="badge bg-light text-dark border">@l.AgenceCode</span></td>
+                        <td class="text-end">@l.TotalDebits.ToString("N2")</td>
+                        <td class="text-end">@l.TotalCredits.ToString("N2")</td>
+                        <td class="text-end text-danger fw-semibold">@(l.SoldeDebiteur > 0 ? l.SoldeDebiteur.ToString("N2") : "-")</td>
+                        <td class="text-end text-success fw-semibold">@(l.SoldeCrediteur > 0 ? l.SoldeCrediteur.ToString("N2") : "-")</td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot class="table-dark fw-bold">
+                    <tr>
+                        <td colspan="3">TOTAUX GÉNÉRAUX</td>
+                        <td class="text-end">@Model.TotalDebitsGlobal.ToString("N2") BIF</td>
+                        <td class="text-end">@Model.TotalCreditsGlobal.ToString("N2") BIF</td>
+                        <td class="text-end text-danger">@Model.TotalSoldesDebiteurs.ToString("N2") BIF</td>
+                        <td class="text-end text-success">@Model.TotalSoldesCrediteurs.ToString("N2") BIF</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,186 @@
+@model AkarangaBank.Web.ViewModels.DocumentDetailsViewModel
+@{
+    ViewData["Title"] = $"Détail document : {Model.Document.Titre}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">@Model.Document.Titre</h1>
+        <p class="text-muted mb-0">Catégorie : <strong>@Model.Document.Categorie</strong> | Enregistré le @Model.Document.DateCreation.ToString("g")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Telecharger" asp-route-id="@Model.Document.Id" class="btn btn-success" aria-label="Télécharger ce document">
+            <i class="bi bi-download"></i> Télécharger (@((Model.Document.TailleOctets / 1024.0).ToString("N1")) Ko)
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Retour à la liste</a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-file-earmark-lock"></i> Fiche Métadonnées &amp; Empreinte</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Nom d'origine</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.Document.NomFichierOriginal</dd>
+
+                    <dt class="col-sm-4 text-muted">Format / Extension</dt>
+                    <dd class="col-sm-8"><span class="badge bg-light text-dark border">@Model.Document.Extension.ToUpperInvariant()</span></dd>
+
+                    <dt class="col-sm-4 text-muted">Taille du fichier</dt>
+                    <dd class="col-sm-8">@Model.Document.TailleOctets.ToString("N0") octets (@((Model.Document.TailleOctets / 1024.0).ToString("N1")) Ko)</dd>
+
+                    <dt class="col-sm-4 text-muted">Empreinte SHA-256</dt>
+                    <dd class="col-sm-8">
+                        <div class="p-2 bg-light rounded font-monospace small text-break">
+                            @Model.Document.HashSha256
+                        </div>
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted mt-2">Statut</dt>
+                    <dd class="col-sm-8 mt-2">
+                        @if (Model.Document.Statut == "Actif")
+                        {
+                            <span class="badge bg-success">Actif</span>
+                        }
+                        else if (Model.Document.Statut == "Archive")
+                        {
+                            <span class="badge bg-secondary">Archivé</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Supprimé (Corbeille)</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted">Déposé par</dt>
+                    <dd class="col-sm-8">@(Model.Document.UploadePar?.NomComplet ?? "Système")</dd>
+
+                    @if (Model.Document.Client != null)
+                    {
+                        <dt class="col-sm-4 text-muted">Client associé</dt>
+                        <dd class="col-sm-8">
+                            <a asp-controller="Clients" asp-action="Details" asp-route-id="@Model.Document.ClientId">
+                                @Model.Document.Client.Nom @Model.Document.Client.Prenom (@Model.Document.Client.NumeroClient)
+                            </a>
+                        </dd>
+                    }
+                    @if (Model.Document.Compte != null)
+                    {
+                        <dt class="col-sm-4 text-muted">Compte associé</dt>
+                        <dd class="col-sm-8">
+                            <a asp-controller="Comptes" asp-action="Details" asp-route-id="@Model.Document.CompteId">
+                                @Model.Document.Compte.NumeroCompte
+                            </a>
+                        </dd>
+                    }
+                    @if (Model.Document.Pret != null)
+                    {
+                        <dt class="col-sm-4 text-muted">Dossier de prêt</dt>
+                        <dd class="col-sm-8">
+                            <a asp-controller="Prets" asp-action="Details" asp-route-id="@Model.Document.PretId">
+                                Prêt @Model.Document.Pret.Reference
+                            </a>
+                        </dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-gear"></i> Actions d'Archivage</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="alert alert-light border small text-muted mb-4">
+                        <i class="bi bi-shield-check"></i> Conformément aux obligations LBC/FT et réglementations de la BRB, les pièces justificatives doivent être conservées et traçables pendant un minimum de 5 à 10 ans.
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    @if (Model.Document.Statut == "Actif")
+                    {
+                        <form asp-action="Archiver" asp-route-id="@Model.Document.Id" method="post" onsubmit="return confirm('Archiver ce document ?');">
+                            <button type="submit" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-archive"></i> Archiver le document
+                            </button>
+                        </form>
+                    }
+                    @if (Model.Document.Statut != "Supprime")
+                    {
+                        <form asp-action="Supprimer" asp-route-id="@Model.Document.Id" method="post" onsubmit="return confirm('Confirmez-vous le placement en corbeille (suppression logique) ?');">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-trash"></i> Placer en corbeille
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Traçabilité des accès (DocumentAcces) -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-shield-shaded"></i> Journal d'Accès &amp; Traçabilité (DocumentAcces)</h5>
+        <span class="text-muted small">@Model.Acces.Count() événement(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Journal d'audit des accès au document">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Journal d'audit des accès au document</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Date &amp; Heure</th>
+                        <th scope="col">Utilisateur</th>
+                        <th scope="col">Type d'action</th>
+                        <th scope="col">Adresse IP</th>
+                        <th scope="col">Agent utilisateur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Acces.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Aucun accès enregistré.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var acc in Model.Acces)
+                    {
+                        <tr>
+                            <td>@acc.DateAcces.ToString("G")</td>
+                            <td>@(acc.Utilisateur?.NomComplet ?? acc.Utilisateur?.Email ?? "Système")</td>
+                            <td>
+                                <span class="badge @(acc.TypeAction == "Telechargement" ? "bg-success" : acc.TypeAction == "Upload" ? "bg-primary" : "bg-secondary")">
+                                    @acc.TypeAction
+                                </span>
+                            </td>
+                            <td class="font-monospace small">@(acc.AdresseIP ?? "127.0.0.1")</td>
+                            <td class="small text-muted text-truncate" style="max-width: 250px;" title="@acc.UserAgent">
+                                @(acc.UserAgent ?? "Navigateur web")
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

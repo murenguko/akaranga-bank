@@ -1,0 +1,174 @@
+﻿@using System.Globalization
+@using System.Text.Json
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@inject IStringLocalizer<SharedResource> T
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Akaranga Bank</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/AkarangaBank.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Skip link pour l'accessibilitÃ© WCAG 2.1 AA (EF-13.12) -->
+    <a href="#main-content" class="skip-link">@T["SkipToMainContent"]</a>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm mb-3" aria-label="@T["PrimaryNavigation"]">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <span class="fs-4 fw-bold" style="color: #1F3864;"><i class="bi bi-bank text-warning me-1" aria-hidden="true"></i> AkarangaBank</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="@T["ToggleNavigation"]">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Agences" asp-action="Index">@T["Branches"]</a>
+                        </li>
+
+                        @if (User.IsInRole("client"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Comptes" asp-action="Index">@T["MyAccounts"]</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Operations" asp-action="VirementPersonnel">@T["MakeTransfer"]</a></li>
+                        }
+
+                        @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("admin") || User.IsInRole("gestionnaire") || User.IsInRole("guichetier") || User.IsInRole("auditeur")))
+                        {
+                            @if (User.IsInRole("admin") || User.IsInRole("gestionnaire")) { <li class="nav-item"><a class="nav-link text-dark" asp-controller="Clients" asp-action="Index">@T["Customers"]</a></li> }
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Comptes" asp-action="Index">@T["Accounts"]</a></li>
+
+                            <!-- Chapitre 12 : Produits bancaires (PrÃªts & Cartes) -->
+                            @if (User.IsInRole("admin") || User.IsInRole("gestionnaire")) { <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Prets" asp-action="Index">@T["Loans"]</a>
+                            </li> }
+                            @if (User.IsInRole("admin")) { <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Cartes" asp-action="Index">Cartes</a>
+                            </li> }
+
+                            <!-- OpÃ©rations & ComptabilitÃ© -->
+                            @if (User.IsInRole("admin") || User.IsInRole("gestionnaire") || User.IsInRole("guichetier"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="menuOperations" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @T["Operations"]
+                                    </a>
+                                    <ul class="dropdown-menu shadow" aria-labelledby="menuOperations">
+                                        <li><a class="dropdown-item" asp-controller="Operations" asp-action="Journal"><i class="bi bi-journal-text me-2" aria-hidden="true"></i> @T["OperationsJournal"]</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-controller="Operations" asp-action="Depot"><i class="bi bi-box-arrow-in-down me-2" aria-hidden="true"></i> @T["Deposit"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Operations" asp-action="Retrait"><i class="bi bi-box-arrow-up me-2" aria-hidden="true"></i> @T["Withdrawal"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Operations" asp-action="Virement"><i class="bi bi-arrow-left-right me-2" aria-hidden="true"></i> @T["Transfer"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="VirementsInterAgences" asp-action="Index"><i class="bi bi-arrows-fullscreen me-2" aria-hidden="true"></i> @T["InterBranchTransfers"]</a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <!-- Chapitre 14 : Documents & Notifications -->
+                            @if (User.IsInRole("admin")) { <li class="nav-item"><a class="nav-link text-dark" asp-controller="Documents" asp-action="Index">@T["Documents"]</a></li> }
+                            @if (!User.IsInRole("auditeur")) { <li class="nav-item"><a class="nav-link text-dark" asp-controller="Notifications" asp-action="Index">@T["Notifications"]</a></li> }
+
+                            <!-- Chapitre 15 : Reporting Financier & Dashboard -->
+                            @if (User.IsInRole("admin")) { <li class="nav-item"><a class="nav-link text-dark" asp-controller="Reporting" asp-action="Dashboard">@T["Reporting"]</a></li> }
+
+                            <!-- ConformitÃ© AML & Supervision Admin -->
+                            @if (User.IsInRole("admin") || User.IsInRole("gestionnaire") || User.IsInRole("auditeur"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="menuAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @T["Supervision"]
+                                    </a>
+                                    <ul class="dropdown-menu shadow" aria-labelledby="menuAdmin">
+                                        <li><a class="dropdown-item" asp-controller="Conformite" asp-action="Alertes"><i class="bi bi-shield-exclamation text-danger me-2" aria-hidden="true"></i> @T["AmlAlerts"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="CNRF" asp-action="Index"><i class="bi bi-file-earmark-text text-warning me-2" aria-hidden="true"></i> @T["CNRFDeclarations"]</a></li>
+                                        @if (User.IsInRole("admin") || User.IsInRole("auditeur"))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Audit" asp-action="Index"><i class="bi bi-eye text-info me-2" aria-hidden="true"></i> @T["AuditTrail"]</a></li>
+                                        }
+                                        @if (User.IsInRole("admin"))
+                                        {
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" asp-controller="SeuilsAML" asp-action="Index"><i class="bi bi-sliders me-2" aria-hidden="true"></i> @T["MonitoringThresholds"]</a></li>
+                                            <li><a class="dropdown-item" asp-controller="Compensations" asp-action="Index"><i class="bi bi-arrow-repeat me-2" aria-hidden="true"></i> @T["InterBranchClearing"]</a></li>
+                                            <li><a class="dropdown-item" asp-controller="AdminUtilisateurs" asp-action="Index"><i class="bi bi-people me-2" aria-hidden="true"></i> @T["UserManagement"]</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <!-- Authentification / profil -->
+                        <partial name="_LoginPartial" />
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid px-4">
+        <main id="main-content" role="main" class="pb-3" tabindex="-1">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-5 py-3 bg-white no-print">
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center small">
+            <div>
+                &copy; @DateTime.UtcNow.Year â€” <strong>Akaranga Bank S.A.</strong> (RÃ©publique du Burundi) - Tous droits rÃ©servÃ©s.
+            </div>
+            <div>
+                <span class="badge bg-light text-dark border me-2">BIF</span>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-muted">@T["PrivacyPolicy"]</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @{
+        var firebaseApiKey = Configuration["Firebase:ApiKey"];
+        var firebaseAuthDomain = Configuration["Firebase:AuthDomain"];
+        var firebaseProjectId = Configuration["Firebase:ProjectId"];
+        var firebaseStorageBucket = Configuration["Firebase:StorageBucket"];
+        var firebaseMessagingSenderId = Configuration["Firebase:MessagingSenderId"];
+        var firebaseAppId = Configuration["Firebase:AppId"];
+        var firebaseMeasurementId = Configuration["Firebase:MeasurementId"];
+        var firebaseConfigured = !string.IsNullOrWhiteSpace(firebaseApiKey)
+            && !string.IsNullOrWhiteSpace(firebaseAuthDomain)
+            && !string.IsNullOrWhiteSpace(firebaseProjectId)
+            && !string.IsNullOrWhiteSpace(firebaseAppId);
+    }
+    @if (firebaseConfigured)
+    {
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js";
+
+            const firebaseConfig = @Html.Raw(JsonSerializer.Serialize(new
+            {
+                apiKey = firebaseApiKey,
+                authDomain = firebaseAuthDomain,
+                projectId = firebaseProjectId,
+                storageBucket = firebaseStorageBucket,
+                messagingSenderId = firebaseMessagingSenderId,
+                appId = firebaseAppId,
+                measurementId = firebaseMeasurementId
+            }));
+
+            const app = initializeApp(firebaseConfig);
+            getAnalytics(app);
+        </script>
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

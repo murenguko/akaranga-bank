@@ -1,0 +1,79 @@
+@model AkarangaBank.Web.ViewModels.CarteEmissionViewModel
+@{
+    ViewData["Title"] = "Émettre une carte bancaire";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h1 class="h4 mb-0" style="color: #1F3864;"><i class="bi bi-credit-card"></i> Émission de Carte Bancaire</h1>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Emettre" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="CompteId" class="form-label fw-semibold"></label>
+                        <select asp-for="CompteId" asp-items="ViewBag.Comptes" class="form-select">
+                            <option value="">-- Sélectionner un compte actif --</option>
+                        </select>
+                        <span asp-validation-for="CompteId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TypeCarte" class="form-label fw-semibold"></label>
+                        <select asp-for="TypeCarte" class="form-select">
+                            <option value="Visa">Visa Internationale (Débutant par 4)</option>
+                            <option value="MasterCard">MasterCard Internationale (Débutant par 5)</option>
+                            <option value="Locale">Carte Privative Locale Akaranga (Débutant par 9)</option>
+                        </select>
+                        <span asp-validation-for="TypeCarte" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="PlafondRetrait" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <input asp-for="PlafondRetrait" class="form-control" type="number" step="50000" />
+                                <span class="input-group-text">BIF</span>
+                            </div>
+                            <span asp-validation-for="PlafondRetrait" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="PlafondPaiement" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <input asp-for="PlafondPaiement" class="form-control" type="number" step="50000" />
+                                <span class="input-group-text">BIF</span>
+                            </div>
+                            <span asp-validation-for="PlafondPaiement" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="PlafondLigne" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <input asp-for="PlafondLigne" class="form-control" type="number" step="50000" />
+                                <span class="input-group-text">BIF</span>
+                            </div>
+                            <span asp-validation-for="PlafondLigne" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border small text-muted my-3">
+                        <i class="bi bi-info-circle"></i> La carte sera émise avec une validité de <strong>3 ans</strong> à compter d'aujourd'hui. Les 16 chiffres du numéro seront générés automatiquement et masqués dans les interfaces publiques pour des raisons de conformité PCI-DSS.
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary" style="background-color: #1F3864; border-color: #1F3864;">
+                            <i class="bi bi-check2-circle"></i> Confirmer l'émission
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

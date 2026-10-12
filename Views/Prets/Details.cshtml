@@ -1,0 +1,313 @@
+@model AkarangaBank.Web.ViewModels.PretDetailsViewModel
+@{
+    ViewData["Title"] = $"Dossier de prêt #{Model.Pret.Reference}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Prêt @Model.Pret.Reference</h1>
+        <p class="text-muted mb-0">Demande soumise le @Model.Pret.DateDemande.ToString("g")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="DocumentsPdf" asp-action="ContratPret" asp-route-id="@Model.Pret.Id" target="_blank" class="btn btn-outline-danger" aria-label="Télécharger le contrat de prêt en PDF">
+            <i class="bi bi-file-earmark-pdf"></i> Contrat PDF
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Retour à la liste</a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-info-circle"></i> Données du Financement</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="text-muted small">Client emprunteur</div>
+                        <div class="fw-bold">
+                            <a asp-controller="Clients" asp-action="Details" asp-route-id="@Model.Pret.ClientId" class="text-decoration-none">
+                                @Model.Pret.Client.Nom @Model.Pret.Client.Prenom (@Model.Pret.Client.NumeroClient)
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small">Compte de débit rattaché</div>
+                        <div class="fw-bold">@Model.Pret.CompteDebit.NumeroCompte</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted small">Capital emprunté</div>
+                        <div class="h5 text-primary mb-0">@Model.Pret.MontantPrincipal.ToString("N2") BIF</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted small">Taux d'intérêt annuel</div>
+                        <div class="h5 mb-0">@Model.Pret.TauxInteret.ToString("0.00") %</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted small">Durée de remboursement</div>
+                        <div class="h5 mb-0">@Model.Pret.DureeMois mois</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted small">Mensualité constante</div>
+                        <div class="fw-bold text-success">@Model.Pret.Mensualite.ToString("N2") BIF</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted small">Capital remboursé</div>
+                        <div class="fw-bold">@Model.Pret.MontantRembourse.ToString("N2") BIF</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted small">Solde restant dû</div>
+                        <div class="fw-bold text-danger">@Model.Pret.SoldeRestant.ToString("N2") BIF</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Pret.Commentaire))
+                    {
+                        <div class="col-12">
+                            <div class="text-muted small">Commentaire / Objet</div>
+                            <div class="p-2 bg-light rounded">@Model.Pret.Commentaire</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Pret.MotifRejet))
+                    {
+                        <div class="col-12">
+                            <div class="text-danger small fw-bold">Motif de rejet</div>
+                            <div class="p-2 bg-danger bg-opacity-10 text-danger rounded">@Model.Pret.MotifRejet</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-shield-check"></i> Statut &amp; Décision</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="mb-3">
+                        <span class="text-muted small d-block">Statut actuel</span>
+                        @if (Model.Pret.Statut == "EnAttente")
+                        {
+                            <span class="badge bg-warning text-dark fs-6">En attente d'approbation</span>
+                        }
+                        else if (Model.Pret.Statut == "Valide")
+                        {
+                            <span class="badge bg-info text-dark fs-6">Validé - Prêt pour déblocage</span>
+                        }
+                        else if (Model.Pret.Statut == "EnCours")
+                        {
+                            <span class="badge bg-primary fs-6">En cours d'amortissement</span>
+                        }
+                        else if (Model.Pret.Statut == "Solde")
+                        {
+                            <span class="badge bg-success fs-6">Intégralement soldé</span>
+                        }
+                        else if (Model.Pret.Statut == "Impaye")
+                        {
+                            <span class="badge bg-danger fs-6">Contentieux / Impayé</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary fs-6">Dossier rejeté</span>
+                        }
+                    </div>
+
+                    @if (Model.Pret.DateValidation.HasValue)
+                    {
+                        <div class="small text-muted mb-2">
+                            Traité le : <strong>@Model.Pret.DateValidation.Value.ToString("g")</strong>
+                        </div>
+                    }
+                    @if (Model.Pret.ValidePar != null)
+                    {
+                        <div class="small text-muted mb-3">
+                            Par : <strong>@Model.Pret.ValidePar.NomComplet</strong>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-grid gap-2 mt-3">
+                    @if (Model.Pret.Statut == "EnAttente")
+                    {
+                        @if (User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+                        {
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalValider">
+                                <i class="bi bi-check-circle"></i> Valider la demande
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalRejeter">
+                                <i class="bi bi-x-circle"></i> Rejeter la demande
+                            </button>
+                        }
+                    }
+                    else if (Model.Pret.Statut == "Valide" && (User.IsInRole("gestionnaire") || User.IsInRole("admin")))
+                    {
+                        <form asp-action="Debloquer" asp-route-id="@Model.Pret.Id" method="post" onsubmit="return confirm('Confirmez-vous le déblocage effectif des fonds sur le compte client ?');">
+                            <button type="submit" class="btn btn-primary w-100" style="background-color: #1F3864; border-color: #1F3864;">
+                                <i class="bi bi-cash-stack"></i> Débloquer les fonds &amp; générer l'échéancier
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tableau de l'échéancier d'amortissement -->
+@if (Model.Echeances.Any())
+{
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-calendar3"></i> Tableau d'Amortissement Constant</h5>
+            <div class="text-muted small">
+                Total remboursé : <strong class="text-success">@Model.TotalPaye.ToString("N2") BIF</strong> / @Model.TotalGeneral.ToString("N2") BIF
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" role="table" aria-label="Échéancier de remboursement">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Échéancier de remboursement</caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Date d'échéance</th>
+                            <th scope="col" class="text-end">Part Capital</th>
+                            <th scope="col" class="text-end">Part Intérêt</th>
+                            <th scope="col" class="text-end">Montant Total</th>
+                            <th scope="col" class="text-end">Pénalité</th>
+                            <th scope="col" class="text-end">Capital Restant</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var ech in Model.Echeances)
+                    {
+                        <tr class="@(ech.Statut == "EnRetard" ? "table-danger" : ech.Statut == "Payee" ? "table-light text-muted" : "")">
+                            <td><strong>@ech.NumeroEcheance</strong></td>
+                            <td>
+                                @ech.DateEcheance.ToString("d")
+                                @if (ech.DatePaiement.HasValue)
+                                {
+                                    <div class="small text-success">Payée le @ech.DatePaiement.Value.ToString("d")</div>
+                                }
+                            </td>
+                            <td class="text-end">@ech.Capital.ToString("N2")</td>
+                            <td class="text-end">@ech.Interet.ToString("N2")</td>
+                            <td class="text-end fw-bold">@ech.MontantTotal.ToString("N2")</td>
+                            <td class="text-end text-danger">@(ech.Penalite > 0 ? ech.Penalite.ToString("N2") : "-")</td>
+                            <td class="text-end">@ech.SoldeRestant.ToString("N2")</td>
+                            <td>
+                                @if (ech.Statut == "Payee")
+                                {
+                                    <span class="badge bg-success">Payée</span>
+                                }
+                                else if (ech.Statut == "EnRetard")
+                                {
+                                    <span class="badge bg-danger">En retard</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">En attente</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (User.IsInRole("guichetier") || User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+                                {
+                                    @if (ech.Statut != "Payee" && (Model.Pret.Statut == "EnCours" || Model.Pret.Statut == "Impaye"))
+                                    {
+                                        <form asp-action="RembourserEcheance" method="post" class="d-inline" onsubmit="return confirm('Confirmer le prélèvement de cette mensualité sur le compte du client ?');">
+                                            <input type="hidden" name="echeanceId" value="@ech.Id" />
+                                            <input type="hidden" name="pretId" value="@Model.Pret.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success" aria-label="Rembourser échéance @ech.NumeroEcheance">
+                                                <i class="bi bi-wallet2"></i> Rembourser
+                                            </button>
+                                        </form>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td colspan="2">Totaux :</td>
+                            <td class="text-end">@Model.TotalCapital.ToString("N2") BIF</td>
+                            <td class="text-end">@Model.TotalInteret.ToString("N2") BIF</td>
+                            <td class="text-end text-primary">@Model.TotalGeneral.ToString("N2") BIF</td>
+                            <td colspan="4"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@if (User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+{
+<!-- Modals pour validation et rejet -->
+<div class="modal fade" id="modalValider" tabindex="-1" aria-labelledby="modalValiderLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="Valider" asp-route-id="@Model.Pret.Id" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalValiderLabel" style="color: #1F3864;">Valider la demande de prêt</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Vous êtes sur le point d'approuver le prêt <strong>@Model.Pret.Reference</strong> pour un montant de <strong>@Model.Pret.MontantPrincipal.ToString("N2") BIF</strong>.</p>
+                    <div class="mb-3">
+                        <label for="tauxPersonnalise" class="form-label">Taux d'intérêt annuel (%) (laisser vide pour conserver @Model.Pret.TauxInteret.ToString("0.00")%)</label>
+                        <input type="number" step="0.1" name="tauxPersonnalise" id="tauxPersonnalise" value="@Model.Pret.TauxInteret" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Confirmer la validation</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalRejeter" tabindex="-1" aria-labelledby="modalRejeterLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="Rejeter" asp-route-id="@Model.Pret.Id" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="modalRejeterLabel">Rejeter la demande de prêt</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="motif" class="form-label fw-bold">Motif du rejet (obligatoire)</label>
+                        <textarea name="motif" id="motif" class="form-control" rows="3" required placeholder="Ex: Capacité d'endettement insuffisante, garanties manquantes..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Confirmer le rejet</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+}

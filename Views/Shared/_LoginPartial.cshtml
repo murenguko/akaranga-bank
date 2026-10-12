@@ -1,0 +1,35 @@
+@using Microsoft.AspNetCore.Identity
+@using AkarangaBank.Web.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IStringLocalizer<SharedResource> T
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    var currentUser = await UserManager.GetUserAsync(User);
+    <li class="nav-item">
+        <span class="nav-link text-dark">
+            @currentUser?.NomComplet
+            @if (currentUser?.TwoFactorEnabled == true)
+            {
+                <span class="badge bg-success">2FA</span>
+            }
+        </span>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">@T["MyAccount"]</a>
+    </li>
+    <li class="nav-item">
+        <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+            <button type="submit" class="nav-link btn btn-link text-dark">@T["Logout"]</button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">@T["Login"]</a>
+    </li>
+}
+</ul>

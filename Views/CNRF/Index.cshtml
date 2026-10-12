@@ -1,0 +1,39 @@
+@model IEnumerable<AkarangaBank.Web.Models.DeclarationSoupcon>
+@{
+    ViewData["Title"] = "Déclarations CNRF";
+    var alerts = ViewBag.Alertes as IEnumerable<AkarangaBank.Web.Models.AlerteAML> ?? Enumerable.Empty<AkarangaBank.Web.Models.AlerteAML>();
+}
+<h1>Déclarations d'opérations suspectes</h1>
+@if (TempData["Success"] is string ok) { <div class="alert alert-success">@ok</div> }
+@if (TempData["Error"] is string err) { <div class="alert alert-danger">@err</div> }
+
+<h2 class="h5 mt-4">Alertes à déclarer</h2>
+<table class="table table-sm">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Date, Client, Type, Niveau, Action</caption>
+    <thead><tr><th scope="col">Date</th><th scope="col">Client</th><th scope="col">Type</th><th scope="col">Niveau</th>@if (User.IsInRole("admin")) { <th scope="col">Action</th> }</tr></thead>
+    <tbody>
+    @foreach (var alert in alerts)
+    {
+        <tr><td>@alert.DateAlerte.ToLocalTime().ToString("g")</td><td>@alert.Client.Nom @alert.Client.Prenom</td><td>@alert.TypeAlerte</td><td>@alert.Niveau</td>
+        @if (User.IsInRole("admin")) { <td><form asp-action="Generer" method="post"><input type="hidden" name="alerteId" value="@alert.Id"/><button class="btn btn-sm btn-primary">Générer DOS</button></form></td> }
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h2 class="h5 mt-4">Déclarations</h2>
+<form method="get" class="mb-3"><select name="statut" class="form-select d-inline-block w-auto"><option value="">Tous les statuts</option>@foreach (var status in new[] { "Brouillon", "Validee", "Transmise", "Accusee", "Rejetee" }) { <option selected="@(ViewBag.Statut == status)" value="@status">@status</option> }</select> <button class="btn btn-outline-primary">Filtrer</button></form>
+<table class="table table-striped">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Date, Référence, Client, Type, Statut, Actions</caption>
+    <thead><tr><th scope="col">Date</th><th scope="col">Référence</th><th scope="col">Client</th><th scope="col">Type</th><th scope="col">Statut</th><th scope="col">Actions</th></tr></thead>
+    <tbody>
+    @foreach (var declaration in Model)
+    {
+        <tr><td>@declaration.DateCreation.ToLocalTime().ToString("g")</td><td>@declaration.Reference</td><td>@declaration.Client.Nom @declaration.Client.Prenom</td><td>@declaration.TypeDeclaration</td><td>@declaration.Statut</td><td>
+            <a asp-action="Details" asp-route-id="@declaration.Id" class="btn btn-sm btn-outline-primary">Détails</a>
+            @if (User.IsInRole("admin") && declaration.Statut is "Brouillon" or "Validee") { <form asp-action="Transmettre" asp-route-id="@declaration.Id" method="post" class="d-inline"><button class="btn btn-sm btn-success">Marquer transmise</button></form> }
+            @if (User.IsInRole("admin") && declaration.Statut == "Transmise") { <form asp-action="Accuser" asp-route-id="@declaration.Id" method="post" class="d-inline"><input name="reponse" value="Accusé CNRF"/><button class="btn btn-sm btn-outline-success">Enregistrer l'accusé</button></form> }
+        </td></tr>
+    }
+    </tbody>
+</table>

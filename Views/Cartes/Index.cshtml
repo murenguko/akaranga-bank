@@ -1,0 +1,175 @@
+@model AkarangaBank.Web.ViewModels.CarteListViewModel
+@{
+    ViewData["Title"] = "Cartes Bancaires";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Parc de Cartes Bancaires</h1>
+        <p class="text-muted mb-0">Émission, gestion des plafonds, blocage/opposition et renouvellement.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Transaction" class="btn btn-outline-primary" aria-label="Simuler ou exécuter une transaction carte">
+            <i class="bi bi-credit-card-2-front"></i> Terminal de paiement / DAB
+        </a>
+        @if (User.IsInRole("admin"))
+        {
+            <a asp-action="Emettre" class="btn btn-primary" style="background-color: #1F3864; border-color: #1F3864;" aria-label="Émettre une nouvelle carte">
+                <i class="bi bi-plus-circle"></i> + Émettre une carte
+            </a>
+        }
+    </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="recherche" class="form-label small text-muted">Rechercher</label>
+                <input type="text" id="recherche" name="recherche" value="@Model.Recherche" class="form-control" placeholder="Numéro masqué, client, compte..." />
+            </div>
+            <div class="col-md-3">
+                <label for="typeCarte" class="form-label small text-muted">Réseau / Type</label>
+                <select id="typeCarte" name="typeCarte" class="form-select">
+                    <option value="">Tous les types</option>
+                    <option value="Visa" selected="@(Model.TypeCarte == "Visa")">Visa</option>
+                    <option value="MasterCard" selected="@(Model.TypeCarte == "MasterCard")">MasterCard</option>
+                    <option value="Locale" selected="@(Model.TypeCarte == "Locale")">Carte Locale</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="statut" class="form-label small text-muted">Statut</label>
+                <select id="statut" name="statut" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="Active" selected="@(Model.Statut == "Active")">Active</option>
+                    <option value="Bloquee" selected="@(Model.Statut == "Bloquee")">Bloquée</option>
+                    <option value="Opposition" selected="@(Model.Statut == "Opposition")">Opposition</option>
+                    <option value="Expiree" selected="@(Model.Statut == "Expiree")">Expirée</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-secondary w-100" aria-label="Filtrer les cartes">
+                    <i class="bi bi-funnel"></i> Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Tableau des cartes bancaires">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Tableau des cartes bancaires</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Numéro masqué</th>
+                        <th scope="col">Titulaire</th>
+                        <th scope="col">Compte rattaché</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Date Expiration</th>
+                        <th scope="col" class="text-end">Plafond Retrait</th>
+                        <th scope="col" class="text-end">Plafond Paiement</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Cartes.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">Aucune carte bancaire enregistrée.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var c in Model.Cartes)
+                    {
+                        <tr>
+                            <td>
+                                <strong class="font-monospace">@c.NumeroMasque</strong>
+                            </td>
+                            <td>
+                                <a asp-controller="Clients" asp-action="Details" asp-route-id="@c.ClientId" class="text-decoration-none">
+                                    @c.Client.Nom @c.Client.Prenom
+                                </a>
+                            </td>
+                            <td>
+                                <a asp-controller="Comptes" asp-action="Details" asp-route-id="@c.CompteId" class="text-decoration-none">
+                                    @c.Compte.NumeroCompte
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge @(c.TypeCarte == "Visa" ? "bg-primary" : c.TypeCarte == "MasterCard" ? "bg-danger" : "bg-dark")">
+                                    @c.TypeCarte
+                                </span>
+                            </td>
+                            <td>
+                                @c.DateExpiration.ToString("MM/yyyy")
+                                @if (c.DateExpiration < DateTime.UtcNow)
+                                {
+                                    <span class="badge bg-danger ms-1">Expirée</span>
+                                }
+                            </td>
+                            <td class="text-end">@c.PlafondRetrait.ToString("N0") BIF</td>
+                            <td class="text-end">@c.PlafondPaiement.ToString("N0") BIF</td>
+                            <td>
+                                @if (c.Statut == "Active")
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else if (c.Statut == "Bloquee")
+                                {
+                                    <span class="badge bg-warning text-dark">Bloquée</span>
+                                }
+                                else if (c.Statut == "Opposition")
+                                {
+                                    <span class="badge bg-danger">Opposition</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@c.Statut</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary" aria-label="Gérer la carte @c.NumeroMasque">
+                                    Gérer
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-4" aria-label="Pagination des cartes">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-recherche="@Model.Recherche" asp-route-statut="@Model.Statut" asp-route-typeCarte="@Model.TypeCarte">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

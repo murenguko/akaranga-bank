@@ -1,0 +1,124 @@
+@model AkarangaBank.Web.ViewModels.RapportAmlMensuelViewModel
+@{
+    ViewData["Title"] = "Rapport Mensuel AML";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Rapport Réglementaire AML &amp; LBC/FT</h1>
+        <p class="text-muted mb-0">Rapport d'activité mensuel — Période : <strong>@($"{Model.Mois:D2}/{Model.Annee}")</strong></p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="ExportExcelAlertes" class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-excel"></i> Exporter Registre AML (Excel)
+        </a>
+        <button onclick="window.print();" class="btn btn-outline-primary">
+            <i class="bi bi-printer"></i> Imprimer
+        </button>
+        <a asp-action="Dashboard" class="btn btn-outline-secondary">Retour au tableau de bord</a>
+    </div>
+</div>
+
+<!-- Synthèse des alertes par niveau -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4">
+            <div class="card-body">
+                <div class="text-danger small text-uppercase fw-bold">Alertes Critiques</div>
+                <div class="h2 fw-bold mb-0 text-danger">@Model.AlertesCritiques</div>
+                <div class="small text-muted">Blocage immédiat</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4">
+            <div class="card-body">
+                <div class="text-warning small text-uppercase fw-bold">Alertes Élevées</div>
+                <div class="h2 fw-bold mb-0 text-warning">@Model.AlertesElevees</div>
+                <div class="small text-muted">Vérification approfondie</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4">
+            <div class="card-body">
+                <div class="text-primary small text-uppercase fw-bold">DOS Transmises</div>
+                <div class="h2 fw-bold mb-0 text-primary">@Model.DosTransmises</div>
+                <div class="small text-muted">Déclarations transmises CNRF</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-secondary border-4">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Montant des flux suspects</div>
+                <div class="h3 fw-bold mb-0 text-dark">@Model.MontantTotalSuspect.ToString("N0") BIF</div>
+                <div class="small text-muted">Sous surveillance</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top 10 clients à risque -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-danger"><i class="bi bi-person-exclamation"></i> Top 10 des Clients Sous Vigilance Renforcée</h5>
+        <span class="small text-muted">Classification de risque d'après profil et historique</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Top clients à risque">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Top clients à risque</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Numéro Client</th>
+                        <th scope="col">Nom &amp; Prénom</th>
+                        <th scope="col">Agence</th>
+                        <th scope="col">Niveau de Risque</th>
+                        <th scope="col" class="text-end">Alertes Générées</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.TopClientsARisque.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Aucun client actuellement classé à risque élevé.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var c in Model.TopClientsARisque)
+                    {
+                        <tr>
+                            <td><strong>@c.NumeroClient</strong></td>
+                            <td>@c.NomComplet</td>
+                            <td><span class="badge bg-light text-dark border">@c.AgenceCode</span></td>
+                            <td>
+                                @if (c.NiveauRisque == "Eleve")
+                                {
+                                    <span class="badge bg-danger">Élevé</span>
+                                }
+                                else if (c.NiveauRisque == "Moyen")
+                                {
+                                    <span class="badge bg-warning text-dark">Moyen</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Faible</span>
+                                }
+                            </td>
+                            <td class="text-end fw-bold">@c.NombreAlertes</td>
+                            <td class="text-end">
+                                <a asp-controller="Clients" asp-action="Details" asp-route-id="@c.ClientId" class="btn btn-sm btn-outline-primary">
+                                    Fiche Client
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

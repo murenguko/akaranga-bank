@@ -1,0 +1,302 @@
+@model AkarangaBank.Web.ViewModels.CarteDetailsViewModel
+@{
+    ViewData["Title"] = $"Carte {Model.Carte.NumeroMasque}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Carte @Model.Carte.NumeroMasque</h1>
+        <p class="text-muted mb-0">Émise le @Model.Carte.DateCreation.ToString("d")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Transaction" asp-route-carteId="@Model.Carte.Id" class="btn btn-primary" style="background-color: #1F3864; border-color: #1F3864;">
+            <i class="bi bi-wallet2"></i> Tester une transaction
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Retour à la liste</a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <!-- Visual Card representation -->
+    <div class="col-lg-5">
+        <div class="p-4 rounded-4 shadow-lg text-white position-relative" style="background: linear-gradient(135deg, #1F3864 0%, #0d1b2a 100%); min-height: 220px; border: 2px solid #C9A227;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="fw-bold tracking-wide" style="color: #C9A227; font-size: 1.2rem;">AKARANGA BANK</span>
+                <span class="badge bg-light text-dark fw-bold px-2 py-1">@Model.Carte.TypeCarte</span>
+            </div>
+            <div class="mb-3">
+                <div class="small text-white-50">Numéro de carte</div>
+                <div class="h4 font-monospace letter-spacing-2 mb-0">@Model.Carte.NumeroMasque</div>
+            </div>
+            <div class="d-flex justify-content-between align-items-end mt-4">
+                <div>
+                    <div class="text-uppercase small text-white-50">Titulaire</div>
+                    <div class="fw-semibold">@Model.Carte.Client.Nom @Model.Carte.Client.Prenom</div>
+                </div>
+                <div class="text-end">
+                    <div class="text-uppercase small text-white-50">Expire fin</div>
+                    <div class="font-monospace fw-bold">@Model.Carte.DateExpiration.ToString("MM/yy")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-body">
+                <h6 class="fw-bold text-muted mb-3">Statut &amp; Actions Rapides</h6>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>Statut :</span>
+                    @if (Model.Carte.Statut == "Active")
+                    {
+                        <span class="badge bg-success fs-6">Active</span>
+                    }
+                    else if (Model.Carte.Statut == "Bloquee")
+                    {
+                        <span class="badge bg-warning text-dark fs-6">Bloquée</span>
+                    }
+                    else if (Model.Carte.Statut == "Opposition")
+                    {
+                        <span class="badge bg-danger fs-6">Opposition</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary fs-6">@Model.Carte.Statut</span>
+                    }
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Carte.MotifOpposition))
+                {
+                    <div class="alert alert-warning py-2 small mb-3">
+                        <strong>Motif :</strong> @Model.Carte.MotifOpposition
+                    </div>
+                }
+
+                <div class="d-grid gap-2">
+                    @if (Model.Carte.Statut == "Active")
+                    {
+                        @if (User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+                        {
+                            <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalBloquer">
+                                <i class="bi bi-pause-circle"></i> Bloquer temporairement
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalOpposition">
+                                <i class="bi bi-shield-x"></i> Mettre en opposition (Perte/Vol)
+                            </button>
+                        }
+                    }
+                    else if (User.IsInRole("admin"))
+                    {
+                        <form asp-action="Renouveler" asp-route-id="@Model.Carte.Id" method="post" onsubmit="return confirm('Confirmez-vous le renouvellement de cette carte ? Une nouvelle carte active sera générée.');">
+                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-arrow-repeat"></i> Renouveler la carte
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details and limits -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-sliders"></i> Plafonds et Paramètres</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <span class="text-muted small d-block">Compte de rattachement</span>
+                        <a asp-controller="Comptes" asp-action="Details" asp-route-id="@Model.Carte.CompteId" class="fw-bold text-decoration-none">
+                            @Model.Carte.Compte.NumeroCompte
+                        </a>
+                        <div class="small text-muted">Solde disponible : @Model.Carte.Compte.Solde.ToString("N2") @Model.Carte.Compte.Devise</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted small d-block">Dépenses du jour</span>
+                        <div class="fw-bold text-primary">@Model.TotalDepenseJour.ToString("N2") BIF</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Plafond journalier de retrait</span>
+                        <span class="fw-bold">@Model.Carte.PlafondRetrait.ToString("N0") BIF</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Plafond journalier de paiement (TPE)</span>
+                        <span class="fw-bold">@Model.Carte.PlafondPaiement.ToString("N0") BIF</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 15%;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Plafond journalier paiements en ligne</span>
+                        <span class="fw-bold">@Model.Carte.PlafondLigne.ToString("N0") BIF</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border small text-muted">
+                    <i class="bi bi-shield-lock"></i> Toutes les transactions par carte font l'objet d'un contrôle automatique de solvabilité, de conformité aux plafonds et de détection anti-blanchiment AML.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transactions History -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-clock-history"></i> Historique des Transactions Carte</h5>
+        <span class="text-muted small">@Model.Transactions.Count() transaction(s) enregistrée(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Historique des transactions de la carte">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Historique des transactions de la carte</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Date &amp; Heure</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Commerçant / Terminal</th>
+                        <th scope="col" class="text-end">Montant</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Détails / Motif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Transactions.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Aucune transaction effectuée avec cette carte.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var tx in Model.Transactions)
+                    {
+                        <tr>
+                            <td>@tx.DateTransaction.ToString("G")</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@tx.TypeTransaction</span>
+                            </td>
+                            <td>@(tx.Commercant ?? "DAB Akaranga Bank")</td>
+                            <td class="text-end fw-bold">@tx.Montant.ToString("N2") BIF</td>
+                            <td>
+                                @if (tx.Statut == "Validee")
+                                {
+                                    <span class="badge bg-success">Validée</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Refusée</span>
+                                }
+                            </td>
+                            <td>
+                                @if (tx.Statut == "Refusee")
+                                {
+                                    <span class="text-danger small"><i class="bi bi-exclamation-triangle"></i> @tx.MotifRefus</span>
+                                }
+                                else if (tx.OperationId.HasValue)
+                                {
+                                    <span class="text-muted small">Opération #@tx.OperationId</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+{
+<!-- Modal Bloquer -->
+<div class="modal fade" id="modalBloquer" tabindex="-1" aria-labelledby="modalBloquerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="Bloquer" method="post">
+            <input type="hidden" name="CarteId" value="@Model.Carte.Id" />
+            <input type="hidden" name="NouveauStatut" value="Bloquee" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalBloquerLabel">Bloquer temporairement la carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="motifBloquer" class="form-label">Motif du blocage</label>
+                        <select name="Motif" id="motifBloquer" class="form-select">
+                            <option value="Demande client">Demande temporaire du client</option>
+                            <option value="Suspicion fraude">Suspicion d'activité anormale</option>
+                            <option value="Autre">Autre motif administratif</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-warning">Bloquer la carte</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Opposition -->
+<div class="modal fade" id="modalOpposition" tabindex="-1" aria-labelledby="modalOppositionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="Bloquer" method="post">
+            <input type="hidden" name="CarteId" value="@Model.Carte.Id" />
+            <input type="hidden" name="NouveauStatut" value="Opposition" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="modalOppositionLabel">Mise en opposition définitive</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-danger small">Cette action empêchera définitivement toute transaction sur cette carte.</p>
+                    <div class="mb-3">
+                        <label for="motifOpposition" class="form-label">Motif de l'opposition</label>
+                        <select name="Motif" id="motifOpposition" class="form-select">
+                            <option value="Perte">Perte de la carte</option>
+                            <option value="Vol">Vol de la carte</option>
+                            <option value="Fraude avérée">Fraude bancaire avérée</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Confirmer l'opposition</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+}

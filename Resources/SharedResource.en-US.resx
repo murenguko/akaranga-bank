@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="AppName"><value>Akaranga Bank</value></data>
+  <data name="Home"><value>Home</value></data>
+  <data name="Branches"><value>Branches</value></data>
+  <data name="Customers"><value>Customers</value></data>
+  <data name="Accounts"><value>Accounts</value></data>
+  <data name="Operations"><value>Operations</value></data>
+  <data name="Loans"><value>Loans</value></data>
+  <data name="Cards"><value>Debit Cards</value></data>
+  <data name="Documents"><value>Documents</value></data>
+  <data name="Notifications"><value>Notifications</value></data>
+  <data name="Reporting"><value>Reports &amp; Statements</value></data>
+  <data name="Users"><value>Users</value></data>
+  <data name="Login"><value>Log in</value></data>
+  <data name="Logout"><value>Log out</value></data>
+  <data name="MyAccount"><value>My Profile</value></data>
+  <data name="Balance"><value>Balance</value></data>
+  <data name="Amount"><value>Amount</value></data>
+  <data name="Status"><value>Status</value></data>
+  <data name="Date"><value>Date</value></data>
+  <data name="Actions"><value>Actions</value></data>
+  <data name="Details"><value>Details</value></data>
+  <data name="Save"><value>Save</value></data>
+  <data name="Cancel"><value>Cancel</value></data>
+  <data name="Filter"><value>Filter</value></data>
+  <data name="Search"><value>Search</value></data>
+  <data name="Deposit"><value>Deposit</value></data>
+  <data name="Withdrawal"><value>Withdrawal</value></data>
+  <data name="Transfer"><value>Transfer</value></data>
+  <data name="Welcome"><value>Welcome to Akaranga Bank</value></data>
+  <data name="Language"><value>Language</value></data>
+  <data name="SkipToMainContent"><value>Skip to main content</value></data>
+  <data name="PrimaryNavigation"><value>Main navigation</value></data>
+  <data name="MyAccounts"><value>My accounts</value></data>
+  <data name="MakeTransfer"><value>Make a transfer</value></data>
+  <data name="OperationsJournal"><value>Operations journal</value></data>
+  <data name="InterBranchTransfers"><value>Inter-branch transfers</value></data>
+  <data name="Supervision"><value>Supervision</value></data>
+  <data name="AmlAlerts"><value>AML alerts</value></data>
+  <data name="CNRFDeclarations"><value>CNRF declarations</value></data>
+  <data name="AuditTrail"><value>Audit trail</value></data>
+  <data name="MonitoringThresholds"><value>Monitoring thresholds</value></data>
+  <data name="InterBranchClearing"><value>Inter-branch clearing</value></data>
+  <data name="UserManagement"><value>User management</value></data>
+  <data name="PrivacyPolicy"><value>Privacy policy</value></data>
+  <data name="ChooseLanguage"><value>Choose the application language</value></data>
+  <data name="FrenchBurundi"><value>French (Burundi)</value></data>
+  <data name="Kirundi"><value>Kirundi</value></data>
+  <data name="EnglishUS"><value>English (US)</value></data>
+  <data name="Kiswahili"><value>Kiswahili</value></data>
+  <data name="TableCaptionPrefix"><value>Table: </value></data>
+  <data name="ToggleNavigation"><value>Toggle navigation menu</value></data>
+</root>

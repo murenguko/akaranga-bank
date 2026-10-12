@@ -1,0 +1,170 @@
+@model AkarangaBank.Web.ViewModels.NotificationListViewModel
+@{
+    ViewData["Title"] = "Centre de Notifications";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Centre de Notifications Multi-Canal</h1>
+        <p class="text-muted mb-0">Emails (MailKit), SMS (Twilio), Push, et alertes internes temps réel (SignalR).</p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+        {
+            <form asp-action="ReessayerTous" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-warning" aria-label="Réessayer les notifications échouées">
+                    <i class="bi bi-arrow-repeat"></i> Réessayer les échecs
+                </button>
+            </form>
+        }
+        @if (User.IsInRole("admin"))
+        {
+            <a asp-action="Templates" class="btn btn-outline-primary" aria-label="Gérer les modèles de messages">
+                <i class="bi bi-layout-text-window-reverse"></i> Modèles (Templates)
+            </a>
+        }
+        <a asp-action="Tester" class="btn btn-primary" style="background-color: #1F3864; border-color: #1F3864;" aria-label="Envoyer une notification de test">
+            <i class="bi bi-send"></i> + Tester un envoi
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="typeNotification" class="form-label small text-muted">Canal</label>
+                <select id="typeNotification" name="typeNotification" class="form-select">
+                    <option value="">Tous les canaux</option>
+                    <option value="Email" selected="@(Model.TypeNotification == "Email")">Email (MailKit)</option>
+                    <option value="Sms" selected="@(Model.TypeNotification == "Sms")">SMS (Twilio)</option>
+                    <option value="Push" selected="@(Model.TypeNotification == "Push")">Push (Firebase)</option>
+                    <option value="Interne" selected="@(Model.TypeNotification == "Interne")">Interne (SignalR)</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label for="statut" class="form-label small text-muted">Statut</label>
+                <select id="statut" name="statut" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    <option value="Envoye" selected="@(Model.Statut == "Envoye")">Envoyé</option>
+                    <option value="EnAttente" selected="@(Model.Statut == "EnAttente")">En attente</option>
+                    <option value="Echec" selected="@(Model.Statut == "Echec")">Échec</option>
+                    <option value="Lu" selected="@(Model.Statut == "Lu")">Lu</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-secondary w-100" aria-label="Filtrer les notifications">
+                    <i class="bi bi-funnel"></i> Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Historique des notifications">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Historique des notifications</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Canal</th>
+                        <th scope="col">Destinataire</th>
+                        <th scope="col">Sujet</th>
+                        <th scope="col">Message / Template</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col" class="text-end">Tentatives</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Notifications.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">Aucune notification enregistrée.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var notif in Model.Notifications)
+                    {
+                        <tr>
+                            <td>@notif.DateCreation.ToString("g")</td>
+                            <td>
+                                <span class="badge @(notif.TypeNotification == "Email" ? "bg-primary" : notif.TypeNotification == "Sms" ? "bg-success" : notif.TypeNotification == "Push" ? "bg-warning text-dark" : "bg-info text-dark")">
+                                    @notif.TypeNotification
+                                </span>
+                            </td>
+                            <td>
+                                <strong>@notif.Destinataire</strong>
+                                @if (notif.Client != null)
+                                {
+                                    <div class="small text-muted">@notif.Client.Nom @notif.Client.Prenom</div>
+                                }
+                            </td>
+                            <td>@notif.Sujet</td>
+                            <td class="text-truncate small" style="max-width: 320px;" title="@notif.Message">
+                                @if (!string.IsNullOrEmpty(notif.TemplateCode))
+                                {
+                                    <span class="badge bg-light text-dark border me-1">@notif.TemplateCode</span>
+                                }
+                                @notif.Message
+                            </td>
+                            <td>
+                                @if (notif.Statut == "Envoye")
+                                {
+                                    <span class="badge bg-success">Envoyé</span>
+                                }
+                                else if (notif.Statut == "Echec")
+                                {
+                                    <span class="badge bg-danger" title="@notif.DerniereErreur">Échec</span>
+                                }
+                                else if (notif.Statut == "Lu")
+                                {
+                                    <span class="badge bg-info text-dark">Lu</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                }
+                            </td>
+                            <td class="text-end font-monospace">
+                                @notif.NombreTentatives / 3
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-4" aria-label="Pagination des notifications">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-statut="@Model.Statut" asp-route-typeNotification="@Model.TypeNotification">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

@@ -1,0 +1,81 @@
+@model IEnumerable<AkarangaBank.Web.Models.NotificationTemplate>
+@{
+    ViewData["Title"] = "Modèles de Notifications (Templates)";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Modèles de Notifications Multi-Lingues</h1>
+        <p class="text-muted mb-0">Templates avec variables dynamiques ({{NomClient}}, {{Montant}}, {{Reference}}...).</p>
+    </div>
+    <div class="d-flex gap-2">
+        <form asp-action="InitialiserTemplates" method="post">
+            <button type="submit" class="btn btn-outline-primary" aria-label="Réinitialiser ou insérer les modèles par défaut">
+                <i class="bi bi-magic"></i> Initialiser modèles par défaut
+            </button>
+        </form>
+        <a asp-action="Index" class="btn btn-outline-secondary">Retour au centre</a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Liste des modèles de notifications">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Liste des modèles de notifications</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Code Événement</th>
+                        <th scope="col">Canal</th>
+                        <th scope="col">Langue</th>
+                        <th scope="col">Sujet du message</th>
+                        <th scope="col">Aperçu du contenu</th>
+                        <th scope="col">Version</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            Aucun modèle en base. Cliquez sur <strong>"Initialiser modèles par défaut"</strong> pour précharger les templates réglementaires.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong class="font-monospace">@t.Code</strong>
+                            </td>
+                            <td>
+                                <span class="badge @(t.TypeNotification == "Email" ? "bg-primary" : "bg-success")">
+                                    @t.TypeNotification
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@t.Langue</span>
+                            </td>
+                            <td>@t.Sujet</td>
+                            <td class="small text-muted text-truncate" style="max-width: 380px;">
+                                @t.ContenuTexte
+                            </td>
+                            <td>v@(t.Version)</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

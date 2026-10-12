@@ -1,0 +1,13 @@
+@model AkarangaBank.Web.Models.Compte
+@{
+    ViewData["Title"] = "Supprimer le compte";
+}
+
+<h1>Supprimer le compte</h1>
+<p>Confirmez la suppression du compte <strong>@Model.NumeroCompte</strong>.</p>
+<p class="text-muted">Seul un compte à solde nul, sans écritures, virement, prêt ni carte peut être supprimé.</p>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    <button type="submit" class="btn btn-danger">Supprimer</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Annuler</a>
+</form>

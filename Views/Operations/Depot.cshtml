@@ -1,0 +1,11 @@
+@model AkarangaBank.Web.ViewModels.DepotViewModel
+@{ ViewData["Title"] = "Dépôt"; }
+<h1>Dépôt</h1>
+<form asp-action="Depot" method="post" class="col-md-6">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="CompteId" class="form-label"></label><select asp-for="CompteId" asp-items="ViewBag.Comptes" class="form-select"><option value="">-- Sélectionner --</option></select><span asp-validation-for="CompteId" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Montant" class="form-label">Montant (BIF)</label><input asp-for="Montant" class="form-control" type="number" min="0.01" step="0.01"/><span asp-validation-for="Montant" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Commentaire" class="form-label"></label><input asp-for="Commentaire" class="form-control"/></div>
+    <button class="btn btn-primary">Enregistrer le dépôt</button>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

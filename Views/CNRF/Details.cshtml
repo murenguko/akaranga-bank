@@ -1,0 +1,3 @@
+@model AkarangaBank.Web.Models.DeclarationSoupcon
+@{ ViewData["Title"] = "Déclaration CNRF"; }
+<h1>Déclaration @Model.Reference</h1><dl class="row"><dt class="col-sm-3">Client</dt><dd class="col-sm-9">@Model.Client.Nom @Model.Client.Prenom (@Model.Client.NumeroClient)</dd><dt class="col-sm-3">Type</dt><dd class="col-sm-9">@Model.TypeDeclaration</dd><dt class="col-sm-3">Statut</dt><dd class="col-sm-9">@Model.Statut</dd><dt class="col-sm-3">Motif</dt><dd class="col-sm-9">@Model.MotifSuspicion</dd><dt class="col-sm-3">Contenu</dt><dd class="col-sm-9"><pre class="text-wrap">@Model.Contenu</pre></dd><dt class="col-sm-3">Réponse</dt><dd class="col-sm-9">@Model.ReponseCNRF</dd></dl>

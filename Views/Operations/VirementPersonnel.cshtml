@@ -1,0 +1,12 @@
+@model AkarangaBank.Web.ViewModels.VirementViewModel
+@{ ViewData["Title"] = "Effectuer un virement"; }
+<h1>Effectuer un virement depuis mon compte</h1>
+<form asp-action="VirementPersonnel" method="post" class="col-md-6">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="CompteSourceId" class="form-label">Mon compte source</label><select asp-for="CompteSourceId" asp-items="ViewBag.ComptesSource" class="form-select"><option value="">-- Sélectionner --</option></select><span asp-validation-for="CompteSourceId" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="NumeroCompteDestination" class="form-label">Numéro du compte destinataire</label><input asp-for="NumeroCompteDestination" class="form-control" autocomplete="off"/><span asp-validation-for="NumeroCompteDestination" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Montant" class="form-label">Montant (BIF)</label><input asp-for="Montant" class="form-control" type="number" min="0.01" step="0.01"/><span asp-validation-for="Montant" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Motif" class="form-label"></label><input asp-for="Motif" class="form-control"/></div>
+    <button class="btn btn-primary">Effectuer le virement</button>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

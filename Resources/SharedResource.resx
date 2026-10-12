@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" msdata:Ordinal="0" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppName" xml:space="preserve"><value>Akaranga Bank</value></data>
+  <data name="Home" xml:space="preserve"><value>Accueil</value></data>
+  <data name="Branches" xml:space="preserve"><value>Agences</value></data>
+  <data name="Customers" xml:space="preserve"><value>Clients</value></data>
+  <data name="Accounts" xml:space="preserve"><value>Comptes</value></data>
+  <data name="Operations" xml:space="preserve"><value>Opérations</value></data>
+  <data name="Loans" xml:space="preserve"><value>Prêts</value></data>
+  <data name="Cards" xml:space="preserve"><value>Cartes</value></data>
+  <data name="Documents" xml:space="preserve"><value>Documents</value></data>
+  <data name="Notifications" xml:space="preserve"><value>Notifications</value></data>
+  <data name="Reporting" xml:space="preserve"><value>Rapports &amp; États</value></data>
+  <data name="Users" xml:space="preserve"><value>Utilisateurs</value></data>
+  <data name="Login" xml:space="preserve"><value>Connexion</value></data>
+  <data name="Logout" xml:space="preserve"><value>Déconnexion</value></data>
+  <data name="MyAccount" xml:space="preserve"><value>Mon compte</value></data>
+  <data name="Balance" xml:space="preserve"><value>Solde</value></data>
+  <data name="Amount" xml:space="preserve"><value>Montant</value></data>
+  <data name="Status" xml:space="preserve"><value>Statut</value></data>
+  <data name="Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Details" xml:space="preserve"><value>Détails</value></data>
+  <data name="Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Filter" xml:space="preserve"><value>Filtrer</value></data>
+  <data name="Search" xml:space="preserve"><value>Rechercher</value></data>
+  <data name="Deposit" xml:space="preserve"><value>Dépôt</value></data>
+  <data name="Withdrawal" xml:space="preserve"><value>Retrait</value></data>
+  <data name="Transfer" xml:space="preserve"><value>Virement</value></data>
+  <data name="Welcome" xml:space="preserve"><value>Bienvenue sur Akaranga Bank</value></data>
+  <data name="Language" xml:space="preserve"><value>Langue</value></data>
+</root>

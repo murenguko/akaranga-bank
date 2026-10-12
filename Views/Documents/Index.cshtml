@@ -1,0 +1,182 @@
+@model AkarangaBank.Web.ViewModels.DocumentListViewModel
+@{
+    ViewData["Title"] = "Gestion Documentaire (GED)";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Système de Gestion Documentaire (GED)</h1>
+        <p class="text-muted mb-0">Stockage sécurisé, intégrité SHA-256, traçabilité et conformité LBC/FT.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Upload" class="btn btn-primary" style="background-color: #1F3864; border-color: #1F3864;" aria-label="Téléverser un nouveau document">
+            <i class="bi bi-cloud-arrow-up"></i> + Téléverser un document
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="recherche" class="form-label small text-muted">Rechercher</label>
+                <input type="text" id="recherche" name="recherche" value="@Model.Recherche" class="form-control" placeholder="Titre, nom de fichier, client..." />
+            </div>
+            <div class="col-md-3">
+                <label for="categorie" class="form-label small text-muted">Catégorie</label>
+                <select id="categorie" name="categorie" class="form-select">
+                    <option value="">Toutes les catégories</option>
+                    <option value="KYC" selected="@(Model.Categorie == "KYC")">KYC (Pièces d'identité)</option>
+                    <option value="Contrat" selected="@(Model.Categorie == "Contrat")">Contrats &amp; Engagements</option>
+                    <option value="Comptable" selected="@(Model.Categorie == "Comptable")">Pièces Comptables</option>
+                    <option value="AML" selected="@(Model.Categorie == "AML")">Conformité &amp; AML</option>
+                    <option value="RH" selected="@(Model.Categorie == "RH")">Ressources Humaines</option>
+                    <option value="Audit" selected="@(Model.Categorie == "Audit")">Rapports d'Audit</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="statut" class="form-label small text-muted">Statut</label>
+                <select id="statut" name="statut" class="form-select">
+                    <option value="">Actifs &amp; Archivés</option>
+                    <option value="Actif" selected="@(Model.Statut == "Actif")">Actif</option>
+                    <option value="Archive" selected="@(Model.Statut == "Archive")">Archivé</option>
+                    <option value="Supprime" selected="@(Model.Statut == "Supprime")">Corbeille</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="clientId" class="form-label small text-muted">Client</label>
+                <select id="clientId" name="clientId" class="form-select">
+                    <option value="">Tous les clients</option>
+                    @foreach (var client in (IEnumerable<AkarangaBank.Web.Models.Client>)ViewBag.Clients)
+                    {
+                        <option value="@client.Id" selected="@(ViewBag.ClientId == client.Id)">@client.Nom @client.Prenom (@client.NumeroClient)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-secondary w-100" aria-label="Filtrer les documents">
+                    <i class="bi bi-funnel"></i> Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" role="table" aria-label="Liste des documents bancaires archivés">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Liste des documents bancaires archivés</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Titre / Fichier</th>
+                        <th scope="col">Catégorie</th>
+                        <th scope="col">Rattachement</th>
+                        <th scope="col">Taille</th>
+                        <th scope="col">Empreinte SHA-256</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Documents.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">Aucun document ne correspond aux critères.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var doc in Model.Documents)
+                    {
+                        <tr>
+                            <td>
+                                <div><strong>@doc.Titre</strong></div>
+                                <small class="text-muted"><i class="bi bi-file-earmark"></i> @doc.NomFichierOriginal</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@doc.Categorie</span>
+                            </td>
+                            <td>
+                                @if (doc.Client != null)
+                                {
+                                    <div><a asp-controller="Clients" asp-action="Details" asp-route-id="@doc.ClientId">@doc.Client.Nom @doc.Client.Prenom</a></div>
+                                }
+                                @if (doc.Pret != null)
+                                {
+                                    <small class="text-muted d-block"><a asp-controller="Prets" asp-action="Details" asp-route-id="@doc.PretId">Prêt @doc.Pret.Reference</a></small>
+                                }
+                                @if (doc.Compte != null)
+                                {
+                                    <small class="text-muted d-block">Compte @doc.Compte.NumeroCompte</small>
+                                }
+                            </td>
+                            <td class="font-monospace small">
+                                @((doc.TailleOctets / 1024.0).ToString("N1")) Ko
+                            </td>
+                            <td>
+                                <code class="small text-truncate d-inline-block" style="max-width: 140px;" title="@doc.HashSha256">
+                                    @doc.HashSha256[..10]...
+                                </code>
+                            </td>
+                            <td>@doc.DateCreation.ToString("d")</td>
+                            <td>
+                                @if (doc.Statut == "Actif")
+                                {
+                                    <span class="badge bg-success">Actif</span>
+                                }
+                                else if (doc.Statut == "Archive")
+                                {
+                                    <span class="badge bg-secondary">Archivé</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Supprimé</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Telecharger" asp-route-id="@doc.Id" class="btn btn-sm btn-outline-success" aria-label="Télécharger le fichier @doc.NomFichierOriginal">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@doc.Id" class="btn btn-sm btn-outline-primary" aria-label="Détails du document @doc.Titre">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-4" aria-label="Pagination des documents">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-recherche="@Model.Recherche" asp-route-categorie="@Model.Categorie" asp-route-statut="@Model.Statut" asp-route-clientId="@ViewBag.ClientId">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

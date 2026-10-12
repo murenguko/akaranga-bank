@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="AppName"><value>Akaranga Bank</value></data>
+  <data name="Home"><value>Nyumbani</value></data>
+  <data name="Branches"><value>Matawi</value></data>
+  <data name="Customers"><value>Wateja</value></data>
+  <data name="Accounts"><value>Akaunti</value></data>
+  <data name="Operations"><value>Miamala</value></data>
+  <data name="Loans"><value>Mikopo</value></data>
+  <data name="Cards"><value>Kadi</value></data>
+  <data name="Documents"><value>Nyaraka</value></data>
+  <data name="Notifications"><value>Taarifa</value></data>
+  <data name="Reporting"><value>Ripoti</value></data>
+  <data name="Users"><value>Watumiaji</value></data>
+  <data name="Login"><value>Ingia</value></data>
+  <data name="Logout"><value>Toka</value></data>
+  <data name="MyAccount"><value>Wasifu Wangu</value></data>
+  <data name="Balance"><value>Salio</value></data>
+  <data name="Amount"><value>Kiasi</value></data>
+  <data name="Status"><value>Hali</value></data>
+  <data name="Date"><value>Tarehe</value></data>
+  <data name="Actions"><value>Vitendo</value></data>
+  <data name="Details"><value>Maelezo</value></data>
+  <data name="Save"><value>Hifadhi</value></data>
+  <data name="Cancel"><value>Ghairi</value></data>
+  <data name="Filter"><value>Chuja</value></data>
+  <data name="Search"><value>Tafuta</value></data>
+  <data name="Deposit"><value>Kuweka</value></data>
+  <data name="Withdrawal"><value>Kutoa</value></data>
+  <data name="Transfer"><value>Uhamisho</value></data>
+  <data name="Welcome"><value>Karibu Akaranga Bank</value></data>
+  <data name="Language"><value>Lugha</value></data>
+  <data name="SkipToMainContent"><value>Ruka hadi kwenye maudhui makuu</value></data>
+  <data name="PrimaryNavigation"><value>Urambazaji mkuu</value></data>
+  <data name="MyAccounts"><value>Akaunti zangu</value></data>
+  <data name="MakeTransfer"><value>Fanya uhamisho</value></data>
+  <data name="OperationsJournal"><value>Daftari la miamala</value></data>
+  <data name="InterBranchTransfers"><value>Uhamisho kati ya matawi</value></data>
+  <data name="Supervision"><value>Usimamizi</value></data>
+  <data name="AmlAlerts"><value>Arifa za AML</value></data>
+  <data name="CNRFDeclarations"><value>Tamko za CNRF</value></data>
+  <data name="AuditTrail"><value>Rekodi ya ukaguzi</value></data>
+  <data name="MonitoringThresholds"><value>Viwango vya ufuatiliaji</value></data>
+  <data name="InterBranchClearing"><value>Ulinganishaji kati ya matawi</value></data>
+  <data name="UserManagement"><value>Usimamizi wa watumiaji</value></data>
+  <data name="PrivacyPolicy"><value>Sera ya faragha</value></data>
+  <data name="ChooseLanguage"><value>Chagua lugha ya programu</value></data>
+  <data name="FrenchBurundi"><value>Kifaransa (Burundi)</value></data>
+  <data name="Kirundi"><value>Kirundi</value></data>
+  <data name="EnglishUS"><value>Kiingereza (Marekani)</value></data>
+  <data name="Kiswahili"><value>Kiswahili</value></data>
+  <data name="TableCaptionPrefix"><value>Jedwali: </value></data>
+  <data name="ToggleNavigation"><value>Fungua au funga menyu ya urambazaji</value></data>
+</root>

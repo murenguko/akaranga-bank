@@ -1,0 +1,173 @@
+@model AkarangaBank.Web.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Tableau de Bord & Reporting";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Tableau de Bord Exécutif &amp; Reporting</h1>
+        <p class="text-muted mb-0">Indicateurs clés de gestion, états comptables et conformité LBC/FT.</p>
+    </div>
+    <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportMenu" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-download"></i> Exports Rapides
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="exportMenu">
+            <li><a class="dropdown-item" asp-action="ExportExcelJournal"><i class="bi bi-file-earmark-excel text-success me-2"></i> Journal (Excel)</a></li>
+            <li><a class="dropdown-item" asp-action="ExportCsvJournal"><i class="bi bi-file-earmark-text text-primary me-2"></i> Journal (CSV)</a></li>
+            <li><a class="dropdown-item" asp-action="ExportExcelBalance"><i class="bi bi-file-earmark-excel text-success me-2"></i> Balance Générale (Excel)</a></li>
+            <li><a class="dropdown-item" asp-action="ExportExcelPrets"><i class="bi bi-file-earmark-excel text-success me-2"></i> Portefeuille Crédits (Excel)</a></li>
+            @if (User.IsInRole("admin"))
+            {
+                <li><a class="dropdown-item" asp-action="ExportExcelAlertes"><i class="bi bi-shield-exclamation text-danger me-2"></i> Alertes AML (Excel)</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Cartes d'indicateurs financiers (Bootstrap 5) -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Clients Actifs</div>
+                <div class="h2 fw-bold mb-1" style="color: #1F3864;">@Model.NombreClients</div>
+                <div class="small text-muted">@Model.NombreComptes comptes ouverts</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Dépôts Globaux</div>
+                <div class="h3 fw-bold mb-1 text-success">@Model.SoldeTotalDepots.ToString("N0") BIF</div>
+                <div class="small text-muted">Ressources clientèles</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Encours Crédits</div>
+                <div class="h3 fw-bold mb-1 text-warning">@Model.EncoursPrets.ToString("N0") BIF</div>
+                <div class="small text-muted">@Model.PretsEnCours prêt(s) en cours d'amortissement</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Vigilance AML</div>
+                <div class="h2 fw-bold mb-1 text-danger">@Model.AlertesAmlOuvertes</div>
+                <div class="small text-muted">Alerte(s) en attente de traitement</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Menu d'accès rapide aux états financiers -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 text-center p-3 h-100">
+            <div class="card-body">
+                <i class="bi bi-scale fs-1 text-primary mb-2"></i>
+                <h5 class="card-title fw-bold">Balance Générale</h5>
+                <p class="card-text text-muted small">Contrôle de l'équilibre comptable en partie double pour chaque compte du grand livre.</p>
+                <a asp-action="Balance" class="btn btn-outline-primary btn-sm">Consulter la Balance</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 text-center p-3 h-100">
+            <div class="card-body">
+                <i class="bi bi-graph-up-arrow fs-1 text-success mb-2"></i>
+                <h5 class="card-title fw-bold">Compte de Résultat</h5>
+                <p class="card-text text-muted small">Synthèse des produits (intérêts perçus, commissions) et des charges (intérêts épargne).</p>
+                <a asp-action="CompteResultat" class="btn btn-outline-success btn-sm">Consulter le Résultat</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 text-center p-3 h-100">
+            <div class="card-body">
+                <i class="bi bi-building fs-1 mb-2" style="color: #C9A227;"></i>
+                <h5 class="card-title fw-bold">Bilan Bancaire</h5>
+                <p class="card-text text-muted small">État du patrimoine bancaire : Actif (créances, réserves) vs Passif &amp; Capitaux propres.</p>
+                <a asp-action="Bilan" class="btn btn-outline-warning btn-sm">Consulter le Bilan</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tableaux d'activité récente -->
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-activity"></i> Flux des Dernières Opérations</h5>
+                <a asp-controller="Operations" asp-action="Journal" class="small text-decoration-none">Journal complet &rarr;</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" role="table" aria-label="Dernières opérations">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Dernières opérations</caption>
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Réf</th>
+                                <th scope="col">Type</th>
+                                <th scope="col" class="text-end">Montant</th>
+                                <th scope="col">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var op in Model.DernieresOperations)
+                        {
+                            <tr>
+                                <td>@op.DateOperation.ToString("g")</td>
+                                <td><small class="font-monospace">@op.Reference</small></td>
+                                <td><span class="badge bg-light text-dark border">@op.TypeOperation</span></td>
+                                <td class="text-end fw-bold">@op.Montant.ToString("N2") BIF</td>
+                                <td><span class="badge bg-success">@op.Statut</span></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-danger"><i class="bi bi-shield-alert"></i> Alertes AML Récentes</h5>
+                <a asp-action="RapportAML" class="small text-danger text-decoration-none">Rapport mensuel &rarr;</a>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                @if (!Model.DernieresAlertes.Any())
+                {
+                    <li class="list-group-item text-center py-4 text-muted">Aucune alerte de vigilance récente.</li>
+                }
+                else
+                {
+                    @foreach (var a in Model.DernieresAlertes)
+                    {
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>@a.TypeAlerte</strong>
+                                <span class="badge @(a.Niveau == "Critique" ? "bg-danger" : a.Niveau == "Eleve" ? "bg-warning text-dark" : "bg-info text-dark")">
+                                    @a.Niveau
+                                </span>
+                            </div>
+                            <div class="small text-muted text-truncate">@a.Description</div>
+                            <div class="small text-muted mt-1"><i class="bi bi-clock"></i> @a.DateAlerte.ToString("g")</div>
+                        </li>
+                    }
+                }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

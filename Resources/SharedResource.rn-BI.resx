@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="AppName"><value>Akaranga Bank</value></data>
+  <data name="Home"><value>Ahabanza</value></data>
+  <data name="Branches"><value>Amashami</value></data>
+  <data name="Customers"><value>Abanywanyi</value></data>
+  <data name="Accounts"><value>Amakonti</value></data>
+  <data name="Operations"><value>Ibikorwa</value></data>
+  <data name="Loans"><value>Ingurane</value></data>
+  <data name="Cards"><value>Amakarata</value></data>
+  <data name="Documents"><value>Inyandiko</value></data>
+  <data name="Notifications"><value>Ubutumwa</value></data>
+  <data name="Reporting"><value>Raporoti</value></data>
+  <data name="Users"><value>Abakoresha</value></data>
+  <data name="Login"><value>Injira</value></data>
+  <data name="Logout"><value>Sohoka</value></data>
+  <data name="MyAccount"><value>Konti yanje</value></data>
+  <data name="Balance"><value>Amahera ariho</value></data>
+  <data name="Amount"><value>Amahera</value></data>
+  <data name="Status"><value>Uko kimeze</value></data>
+  <data name="Date"><value>Itariki</value></data>
+  <data name="Actions"><value>Ibyakorwa</value></data>
+  <data name="Details"><value>Ubusobanuro</value></data>
+  <data name="Save"><value>Bika</value></data>
+  <data name="Cancel"><value>Hagarika</value></data>
+  <data name="Filter"><value>Cungura</value></data>
+  <data name="Search"><value>Rondera</value></data>
+  <data name="Deposit"><value>Kwinjiza amahera</value></data>
+  <data name="Withdrawal"><value>Gukura amahera</value></data>
+  <data name="Transfer"><value>Kurungika amahera</value></data>
+  <data name="Welcome"><value>Kaze muri Akaranga Bank</value></data>
+  <data name="Language"><value>Ururimi</value></data>
+  <data name="SkipToMainContent"><value>Ja ku biri ku rubuga nyamukuru</value></data>
+  <data name="PrimaryNavigation"><value>Ibikurikiranwa nyamukuru</value></data>
+  <data name="MyAccounts"><value>Amakonti yanje</value></data>
+  <data name="MakeTransfer"><value>Rungika amahera</value></data>
+  <data name="OperationsJournal"><value>Igitabu c'ibikorwa</value></data>
+  <data name="InterBranchTransfers"><value>Ukurungika amahera hagati y'amashami</value></data>
+  <data name="Supervision"><value>Ubugenzuzi</value></data>
+  <data name="AmlAlerts"><value>Imenyesha rya AML</value></data>
+  <data name="CNRFDeclarations"><value>Amatangazo ya CNRF</value></data>
+  <data name="AuditTrail"><value>Urukurikirane rw'igenzura</value></data>
+  <data name="MonitoringThresholds"><value>Imipaka y'igenzura</value></data>
+  <data name="InterBranchClearing"><value>Ukwishurana hagati y'amashami</value></data>
+  <data name="UserManagement"><value>Uburongozi bw'abakoresha</value></data>
+  <data name="PrivacyPolicy"><value>Amategeko y'ibanga</value></data>
+  <data name="ChooseLanguage"><value>Hitamwo ururimi rw'urubuga</value></data>
+  <data name="FrenchBurundi"><value>Igifaransa (Uburundi)</value></data>
+  <data name="Kirundi"><value>Ikirundi</value></data>
+  <data name="EnglishUS"><value>Icyongereza (Amerika)</value></data>
+  <data name="Kiswahili"><value>Igiswahili</value></data>
+  <data name="TableCaptionPrefix"><value>Imbonerahamwe: </value></data>
+  <data name="ToggleNavigation"><value>Fungura canke ufunge urutonde rw'ibikurikiranwa</value></data>
+</root>

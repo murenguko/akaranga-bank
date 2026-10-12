@@ -1,0 +1,82 @@
+@model AkarangaBank.Web.Models.Client
+@{
+    ViewData["Title"] = "Nouveau client";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h1 class="h4 mb-0" style="color: #1F3864;"><i class="bi bi-person-plus"></i> Enregistrement d'un Client</h1>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="NumeroClient" class="form-label fw-semibold">Numéro Client</label>
+                            <input asp-for="NumeroClient" class="form-control" placeholder="CLI-000006" required />
+                            <span asp-validation-for="NumeroClient" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NumeroCNI" class="form-label fw-semibold">Numéro CNI</label>
+                            <input asp-for="NumeroCNI" class="form-control" placeholder="BJM-1234567" required />
+                            <span asp-validation-for="NumeroCNI" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Nom" class="form-label fw-semibold">Nom</label>
+                            <input asp-for="Nom" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Prenom" class="form-label fw-semibold">Prénom</label>
+                            <input asp-for="Prenom" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="DateNaissance" class="form-label fw-semibold">Date de naissance</label>
+                            <input asp-for="DateNaissance" type="date" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="AgenceId" class="form-label fw-semibold">Agence</label>
+                            <select asp-for="AgenceId" asp-items="ViewBag.Agences" class="form-select" required>
+                                <option value="">-- Sélectionner une agence --</option>
+                            </select>
+                            <span asp-validation-for="AgenceId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Telephone" class="form-label">Téléphone</label>
+                            <input asp-for="Telephone" class="form-control" placeholder="+257..." />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="client@akaranga.bi" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Adresse" class="form-label">Adresse</label>
+                        <input asp-for="Adresse" class="form-control" placeholder="Quartier Rohero, Bujumbura" />
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary" style="background-color: #1F3864;">Enregistrer le client</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

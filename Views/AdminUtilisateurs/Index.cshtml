@@ -1,0 +1,89 @@
+@model IEnumerable<AkarangaBank.Web.Models.ApplicationUser> 
+@{ 
+    ViewData["Title"] = "Administration des utilisateurs"; 
+} 
+ 
+<h1>Utilisateurs</h1> 
+ 
+
+ 
+@if (TempData["Success"] is string msg) 
+{ 
+    <div class="alert alert-success">@msg</div> 
+} 
+ 
+<div class="mb-3 text-end"> 
+    <a asp-action="Create" class="btn btn-success">+ Nouvel utilisateur</a> 
+</div> 
+ 
+<table class="table table-striped">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Nom, Email, Rôle, Agence, 2FA, Actif, Dossier client</caption> 
+    <thead> 
+        <tr> 
+            <th scope="col">Nom</th> 
+            <th scope="col">Email</th> 
+            <th scope="col">Rôle</th> 
+            <th scope="col">Agence</th> 
+            <th scope="col">2FA</th> 
+            <th scope="col">Actif</th> 
+            <th scope="col">Dossier client</th>
+            <th scope="col"></th> 
+        </tr> 
+    </thead> 
+    <tbody> 
+    @foreach (var u in Model) 
+    { 
+        <tr> 
+            <td>@u.NomComplet</td> 
+            <td>@u.Email</td> 
+            <td>@u.Role</td> 
+            <td>@u.Agence.Code</td> 
+            <td> 
+                @if (u.TwoFactorEnabled) 
+                { 
+                    <span class="badge bg-success">Activée</span> 
+                } 
+                else 
+                { 
+                    <span class="badge bg-warning text dark">Inactive</span> 
+                } 
+            </td> 
+            <td> 
+                <span class="badge @(u.EstActif ? "bg-success" : "bg secondary")"> 
+                    @(u.EstActif ? "Oui" : "Non") 
+                </span> 
+            </td> 
+            <td>
+                @if (u.Role == "client")
+                {
+                    <form asp-action="AssocierClient" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="userId" value="@u.Id" />
+                        <select name="clientId" class="form-select form-select-sm">
+                            <option value="">Aucun dossier lié</option>
+                            @foreach (var client in (IEnumerable<AkarangaBank.Web.Models.Client>)ViewBag.Clients)
+                            {
+                                <option value="@client.Id" selected="@(u.ClientId == client.Id)">@client.Nom @client.Prenom — @client.NumeroClient</option>
+                            }
+                        </select>
+                        <button class="btn btn-sm btn-outline-primary">Enregistrer</button>
+                    </form>
+                }
+                else
+                {
+                    <span class="text-muted">—</span>
+                }
+            </td>
+            <td> 
+
+ 
+                <form asp-action="ToggleActif" asp-route-id="@u.Id" 
+method="post" class="d-inline"> 
+                    <button type="submit" class="btn btn-sm btn-warning"> 
+                        @(u.EstActif ? "Désactiver" : "Activer") 
+                    </button> 
+                </form> 
+            </td> 
+        </tr> 
+    } 
+    </tbody> 
+</table> 

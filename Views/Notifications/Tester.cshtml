@@ -1,0 +1,90 @@
+@model AkarangaBank.Web.ViewModels.NotificationSendTestViewModel
+@{
+    ViewData["Title"] = "Test d'envoi de notification";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h1 class="h4 mb-0" style="color: #1F3864;"><i class="bi bi-broadcast"></i> Test d'Émission Multi-Canal</h1>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Tester" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="TypeNotification" class="form-label fw-semibold"></label>
+                        <select asp-for="TypeNotification" class="form-select" id="canalSelect">
+                            <option value="Email">Email (Protocole SMTP via MailKit)</option>
+                            <option value="Sms">SMS (Passerelle Twilio)</option>
+                            <option value="Push">Push (Firebase Cloud Messaging)</option>
+                            <option value="Interne">Interne Temps Réel (SignalR)</option>
+                        </select>
+                        <span asp-validation-for="TypeNotification" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Destinataire" class="form-label fw-semibold" id="destinataireLabel">Adresse Email</label>
+                        <input asp-for="Destinataire" class="form-control" id="destinataireInput" />
+                        <div class="form-text" id="destinataireHelp">Adresse email du client ou destinataire.</div>
+                        <span asp-validation-for="Destinataire" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Sujet" class="form-label fw-semibold"></label>
+                        <input asp-for="Sujet" class="form-control" />
+                        <span asp-validation-for="Sujet" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Message" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Message" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Message" class="text-danger small"></span>
+                    </div>
+
+                    <div class="alert alert-light border small text-muted">
+                        <i class="bi bi-info-circle"></i> Si les identifiants réels (clés SMTP ou Twilio) ne sont pas configurés dans <code>appsettings.json</code> ou via <code>dotnet user-secrets</code>, le système capture et journalise automatiquement l'envoi en mode simulation sécurisé sans interruption de service.
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary" style="background-color: #1F3864; border-color: #1F3864;">
+                            <i class="bi bi-send-check"></i> Émettre la notification
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('canalSelect').addEventListener('change', function() {
+            const val = this.value;
+            const label = document.getElementById('destinataireLabel');
+            const help = document.getElementById('destinataireHelp');
+            const input = document.getElementById('destinataireInput');
+
+            if (val === 'Email') {
+                label.innerText = 'Adresse Email';
+                help.innerText = 'Ex: client@akaranga.bi';
+                if (!input.value.includes('@@')) input.value = 'client@akaranga.bi';
+            } else if (val === 'Sms') {
+                label.innerText = 'Numéro de Téléphone (format international)';
+                help.innerText = 'Ex: +25779123456';
+                input.value = '+25779123456';
+            } else if (val === 'Push') {
+                label.innerText = 'Token FCM ou ID Appareil';
+                help.innerText = 'Identifiant du terminal mobile';
+                input.value = 'device_token_sample';
+            } else {
+                label.innerText = 'Cible Interne';
+                help.innerText = 'Tous les utilisateurs connectés ou identifiant';
+                input.value = 'Tous';
+            }
+        });
+    </script>
+}

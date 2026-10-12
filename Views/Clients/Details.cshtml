@@ -1,0 +1,100 @@
+@model AkarangaBank.Web.Models.Client
+@{
+    ViewData["Title"] = $"Client {Model.Nom} {Model.Prenom}";
+}
+
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">@Model.Nom @Model.Prenom</h1>
+        <p class="text-muted mb-0">N° Client : <strong>@Model.NumeroClient</strong> | CNI : <strong>@Model.NumeroCNI</strong></p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+        {
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Supprimer</a>
+        }
+        @if (User.IsInRole("guichetier") || User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+        {
+            <a asp-controller="Prets" asp-action="Demande" asp-route-clientId="@Model.Id" class="btn btn-outline-primary">
+                <i class="bi bi-file-earmark-plus"></i> Nouveau prêt
+            </a>
+        }
+        <a asp-controller="Documents" asp-action="Upload" asp-route-clientId="@Model.Id" class="btn btn-outline-secondary">
+            <i class="bi bi-upload"></i> Joindre document (GED)
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Retour à la liste</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-person-lines-fill"></i> Coordonnées &amp; Agence</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Agence</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.Agence?.Nom (@Model.Agence?.Code)</dd>
+
+                    <dt class="col-sm-4 text-muted">Date de naissance</dt>
+                    <dd class="col-sm-8">@Model.DateNaissance.ToString("d")</dd>
+
+                    <dt class="col-sm-4 text-muted">Téléphone</dt>
+                    <dd class="col-sm-8">@(Model.Telephone ?? "-")</dd>
+
+                    <dt class="col-sm-4 text-muted">Email</dt>
+                    <dd class="col-sm-8">@(Model.Email ?? "-")</dd>
+
+                    <dt class="col-sm-4 text-muted">Adresse</dt>
+                    <dd class="col-sm-8">@(Model.Adresse ?? "-")</dd>
+
+                    <dt class="col-sm-4 text-muted">Statut</dt>
+                    <dd class="col-sm-8"><span class="badge bg-success">@Model.Statut</span></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" style="color: #1F3864;"><i class="bi bi-wallet2"></i> Comptes Bancaires</h5>
+                @if (User.IsInRole("guichetier") || User.IsInRole("gestionnaire") || User.IsInRole("admin"))
+                {
+                    <a asp-controller="Comptes" asp-action="Create" asp-route-clientId="@Model.Id" class="btn btn-sm btn-outline-success">+ Ouvrir un compte</a>
+                }
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                @if (!Model.Comptes.Any())
+                {
+                    <li class="list-group-item text-muted py-3">Aucun compte bancaire ouvert pour ce client.</li>
+                }
+                else
+                {
+                    @foreach (var c in Model.Comptes)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <a asp-controller="Comptes" asp-action="Details" asp-route-id="@c.Id" class="fw-bold text-decoration-none">
+                                    @c.NumeroCompte
+                                </a>
+                                <span class="badge bg-light text-dark border ms-2">@c.TypeCompte?.Libelle</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold text-primary">@c.Solde.ToString("N2") @c.Devise</span>
+                            </div>
+                        </li>
+                    }
+                }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

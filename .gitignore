@@ -1,0 +1,48 @@
+# Fichiers générés par .NET
+bin/
+obj/
+artifacts/
+publish/
+out/
+
+# IDE et fichiers utilisateur
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Journaux, fichiers temporaires et couverture
+*.log
+logs/
+tmp/
+coverage/
+TestResults/
+
+# Documents déposés par les utilisateurs
+Storage/Documents/*
+!Storage/Documents/.gitkeep
+
+# Paramètres locaux pouvant contenir des secrets
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.local.json
+secrets.json
+.env
+.env.*
+!.env.example
+
+# Déploiement et conteneurs
+publish-profile.xml
+*.publishsettings
+.docker/
+
+# Système d'exploitation
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+
+instructions.md

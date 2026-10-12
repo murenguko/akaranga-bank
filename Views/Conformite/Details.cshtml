@@ -1,0 +1,21 @@
+@model AkarangaBank.Web.Models.AlerteAML
+@{ ViewData["Title"] = "Détail de l'alerte"; }
+<h1>Alerte @Model.TypeAlerte</h1>
+<dl class="row">
+    <dt class="col-sm-3">Client</dt><dd class="col-sm-9">@Model.Client.Nom @Model.Client.Prenom (@Model.Client.NumeroClient)</dd>
+    <dt class="col-sm-3">Niveau</dt><dd class="col-sm-9">@Model.Niveau</dd>
+    <dt class="col-sm-3">Statut</dt><dd class="col-sm-9">@Model.Statut</dd>
+    <dt class="col-sm-3">Description</dt><dd class="col-sm-9">@Model.Description</dd>
+    <dt class="col-sm-3">Opération</dt><dd class="col-sm-9">@Model.Operation?.Reference — @Model.Operation?.Montant.ToString("N2") @Model.Operation?.Devise</dd>
+</dl>
+<p><a asp-controller="CNRF" asp-action="Index" class="btn btn-outline-primary">Ouvrir le workflow CNRF</a>
+@if (User.IsInRole("admin")) { <a asp-action="RisqueClient" asp-route-id="@Model.ClientId" class="btn btn-outline-secondary">Évaluer le risque client</a> }</p>
+@if (User.IsInRole("admin"))
+{
+    <form asp-action="Traiter" method="post" class="row g-2">
+        <input type="hidden" name="id" value="@Model.Id"/>
+        <div class="col-auto"><select name="statut" class="form-select"><option>EnCours</option><option>Traitee</option><option>Classee</option></select></div>
+        <div class="col-auto"><input name="commentaire" class="form-control" maxlength="500" placeholder="Commentaire"/></div>
+        <div class="col-auto"><button class="btn btn-primary">Mettre à jour</button></div>
+    </form>
+}

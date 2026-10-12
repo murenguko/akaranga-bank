@@ -1,0 +1,60 @@
+@model AkarangaBank.Web.Models.Compte
+@{
+    ViewData["Title"] = "Ouvrir un compte";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h1 class="h4 mb-0" style="color: #1F3864;"><i class="bi bi-wallet2"></i> Ouverture de Compte Bancaire</h1>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="NumeroCompte" class="form-label fw-semibold">Numéro de Compte</label>
+                        <input asp-for="NumeroCompte" class="form-control" placeholder="BJM-0001-0003" required />
+                        <span asp-validation-for="NumeroCompte" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ClientId" class="form-label fw-semibold">Titulaire du compte</label>
+                        <select asp-for="ClientId" asp-items="ViewBag.Clients" class="form-select" required>
+                            <option value="">-- Choisir un client --</option>
+                        </select>
+                        <span asp-validation-for="ClientId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TypeCompteId" class="form-label fw-semibold">Type de compte</label>
+                        <select asp-for="TypeCompteId" asp-items="ViewBag.TypesCompte" class="form-select" required>
+                            <option value="">-- Choisir un type de compte --</option>
+                        </select>
+                        <span asp-validation-for="TypeCompteId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AgenceId" class="form-label fw-semibold">Agence de domiciliation</label>
+                        <select asp-for="AgenceId" asp-items="ViewBag.Agences" class="form-select" required>
+                            <option value="">-- Choisir une agence --</option>
+                        </select>
+                        <span asp-validation-for="AgenceId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Solde" class="form-label fw-semibold">Dépôt Initial (BIF)</label>
+                        <input asp-for="Solde" class="form-control" type="number" step="1000" value="0" />
+                        <span asp-validation-for="Solde" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary" style="background-color: #1F3864;">Créer le compte</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

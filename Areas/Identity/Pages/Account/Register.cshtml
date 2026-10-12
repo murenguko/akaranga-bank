@@ -1,0 +1,62 @@
+@page
+@model RegisterModel
+
+@{
+    ViewData["Title"] = "Créer un compte";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+            <h2>Inscrivez-vous avec votre adresse e-mail.</h2>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.NomComplet" class="form-control" autocomplete="name" aria-required="true" />
+                <label asp-for="Input.NomComplet"></label>
+                <span asp-validation-for="Input.NomComplet" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                <label asp-for="Input.Email"></label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.AgenceId" class="form-label"></label>
+                <select asp-for="Input.AgenceId" asp-items="Model.Agences" class="form-select">
+                    <option value="0">Sélectionnez votre agence</option>
+                </select>
+                <span asp-validation-for="Input.AgenceId" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" />
+                <label asp-for="Input.Password"></label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+                <label asp-for="Input.ConfirmPassword"></label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            @if (Model.Agences.Count == 0)
+            {
+                <div class="alert alert-warning" role="alert">
+                    Aucune agence n’est disponible. Veuillez contacter l’administrateur avant de créer un compte.
+                </div>
+            }
+            <button type="submit" class="w-100 btn btn-lg btn-primary" disabled="@(Model.Agences.Count == 0)">Créer un compte</button>
+            <p class="mt-3 text-center"><a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Déjà inscrit ? Se connecter</a></p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

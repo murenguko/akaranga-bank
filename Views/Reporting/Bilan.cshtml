@@ -1,0 +1,110 @@
+@model AkarangaBank.Web.ViewModels.BilanViewModel
+@{
+    ViewData["Title"] = "Bilan Bancaire";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: #1F3864;">Bilan Bancaire Simplifié</h1>
+        <p class="text-muted mb-0">Arrêté au @Model.DateArrete.ToString("dd MMMM yyyy")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button onclick="window.print();" class="btn btn-outline-primary">
+            <i class="bi bi-printer"></i> Imprimer
+        </button>
+        <a asp-action="Dashboard" class="btn btn-outline-secondary">Retour au tableau de bord</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- ACTIF -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-bottom border-primary border-2">
+                <h5 class="mb-0 fw-bold" style="color: #1F3864;"><i class="bi bi-wallet-fill text-primary"></i> ACTIF (Emplois)</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm align-middle">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Bilan Bancaire Simplifié</caption>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Réserves de trésorerie et avoirs banque centrale (BRB)</strong>
+                                <div class="small text-muted">Disponibilités liquides et réserves obligatoires</div>
+                            </td>
+                            <td class="text-end fw-semibold">@Model.ReservesTresorerieEtBanqueCentrale.ToString("N2") BIF</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Créances sur la clientèle (Prêts en cours)</strong>
+                                <div class="small text-muted">Capital restant dû sur crédits accordés</div>
+                            </td>
+                            <td class="text-end fw-semibold">@Model.PretsEtCreancesClients.ToString("N2") BIF</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="p-3 bg-light rounded d-flex justify-content-between align-items-center border mt-4">
+                    <span class="h6 mb-0 text-primary fw-bold">TOTAL DE L'ACTIF</span>
+                    <span class="h5 mb-0 text-primary fw-bold">@Model.TotalActif.ToString("N2") BIF</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSIF ET CAPITAUX PROPRES -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-bottom border-warning border-2">
+                <h5 class="mb-0 fw-bold" style="color: #1F3864;"><i class="bi bi-bank2" style="color: #C9A227;"></i> PASSIF &amp; CAPITAUX PROPRES (Ressources)</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm align-middle">
+                <caption class="visually-hidden">@TableText["TableCaptionPrefix"] Bilan Bancaire Simplifié</caption>
+                    <tbody>
+                        <tr class="table-light">
+                            <td colspan="2" class="fw-bold text-muted small">DETTES ENVERS LA CLIENTÈLE (PASSIF)</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">
+                                Dépôts sur comptes à vue (courants)
+                            </td>
+                            <td class="text-end">@Model.DepotsComptesCourants.ToString("N2") BIF</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">
+                                Dépôts sur comptes d'épargne rémunérés
+                            </td>
+                            <td class="text-end">@Model.DepotsComptesEpargne.ToString("N2") BIF</td>
+                        </tr>
+                        <tr class="table-light">
+                            <td colspan="2" class="fw-bold text-muted small">CAPITAUX PROPRES</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">
+                                Capital social souscrit et libéré
+                            </td>
+                            <td class="text-end">@Model.CapitalSocial.ToString("N2") BIF</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">
+                                Réserves réglementaires &amp; résultat reporté
+                            </td>
+                            <td class="text-end">@Model.ReservesEtResultatReporte.ToString("N2") BIF</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="p-3 bg-light rounded d-flex justify-content-between align-items-center border mt-4">
+                    <span class="h6 mb-0 fw-bold" style="color: var(--akaranga-gold-text);">TOTAL PASSIF &amp; CAPITAUX</span>
+                    <span class="h5 mb-0 fw-bold" style="color: var(--akaranga-gold-text);">@Model.TotalPassifEtCapitaux.ToString("N2") BIF</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info d-flex align-items-center" role="alert">
+    <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+    <div>
+        <strong>Équilibre Actif / Passif :</strong> Le total de l'Actif (@Model.TotalActif.ToString("N2") BIF) équilibre les ressources exigibles et fonds propres.
+    </div>
+</div>
