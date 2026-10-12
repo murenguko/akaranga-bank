@@ -1,20 +1,19 @@
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: postgres:18-alpine
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-akarangabank}
+      POSTGRES_USER: ${POSTGRES_USER:-akaranga_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
-      - mssql_data:/var/opt/mssql
+      - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test:
-        - CMD-SHELL
-        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$${MSSQL_SA_PASSWORD}" -C -Q "SELECT 1" || exit 1
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 12
-      start_period: 30s
+      start_period: 10s
 
   web:
     build:
@@ -23,8 +22,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_HTTP_PORTS: 8080
-      Database__MigrateOnStartup: "true"
-      ConnectionStrings__AkarangaBank: "Server=db;Database=AkarangaBank;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env};Encrypt=True;TrustServerCertificate=True"
+      Database__MigrateOnStartup: "false"
+      ConnectionStrings__AkarangaBank: "Host=db;Port=5432;Database=${POSTGRES_DB:-akarangabank};Username=${POSTGRES_USER:-akaranga_app};Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
     depends_on:
       db:
         condition: service_healthy
@@ -35,5 +34,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  mssql_data:
+  postgres_data:
   document_data:

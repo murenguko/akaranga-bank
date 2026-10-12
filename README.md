@@ -5,13 +5,7 @@ Application web de gestion bancaire réalisée avec ASP.NET Core. Elle regroupe 
 ## Prérequis
 
 - SDK .NET 10.0 ou supérieur.
-- SQL Server 2022 ou supérieur, installé localement ou accessible sur le réseau.
-- Outil Entity Framework Core en ligne de commande (`dotnet-ef`) pour appliquer les migrations :
-
-  ```powershell
-  dotnet tool install --global dotnet-ef --version 10.0.12
-  ```
-
+- PostgreSQL 16 ou supérieur, installé localement ou accessible sur le réseau.
 ## Installation
 
 1. Clonez le dépôt, puis ouvrez un terminal dans le dossier contenant `AkarangaBank.Web.csproj`.
@@ -21,21 +15,15 @@ Application web de gestion bancaire réalisée avec ASP.NET Core. Elle regroupe 
    dotnet restore
    ```
 
-3. Configurez la chaîne de connexion SQL Server sous la clé `ConnectionStrings:AkarangaBank`. Pour le développement, utilisez les secrets utilisateur afin de ne pas enregistrer de mot de passe dans les fichiers suivis par Git :
+3. Configurez la chaîne de connexion PostgreSQL sous la clé `ConnectionStrings:AkarangaBank`. Pour le développement, utilisez les secrets utilisateur afin de ne pas enregistrer de mot de passe dans les fichiers suivis par Git :
 
    ```powershell
-   dotnet user-secrets set "ConnectionStrings:AkarangaBank" "Server=localhost,1433;Database=AkarangaBank;User Id=sa;Password=VotreMotDePasse;TrustServerCertificate=True;Encrypt=False"
+   dotnet user-secrets set "ConnectionStrings:AkarangaBank" "Host=localhost;Port=5432;Database=akarangabank;Username=akaranga_app;Password=VotreMotDePasse"
    ```
 
-   Adaptez le serveur, l’authentification et le mot de passe à votre installation SQL Server. Les paramètres SMTP, Twilio et Firebase sont facultatifs et peuvent être configurés de la même manière selon les fonctionnalités utilisées.
+   Adaptez l’hôte, la base, l’utilisateur et le mot de passe à votre installation PostgreSQL. Les paramètres SMTP, Twilio et Firebase sont facultatifs et peuvent être configurés de la même manière selon les fonctionnalités utilisées.
 
-4. Créez la base et appliquez les migrations :
-
-   ```powershell
-   dotnet ef database update
-   ```
-
-   Le fichier `AkarangaBank-Script-DB.sql` est également fourni comme script de référence pour SQL Server. N’exécutez pas ce script sur une base contenant des données à conserver : il commence par supprimer la base `AkarangaBank` si elle existe.
+4. Créez la base et préparez son schéma ainsi que les tables ASP.NET Identity avant de démarrer l’application. Les anciens scripts et migrations SQL Server ne sont pas compatibles avec PostgreSQL.
 
 ## Lancement
 
@@ -45,7 +33,14 @@ Depuis le dossier du projet, lancez l’application :
 dotnet run
 ```
 
-Ouvrez ensuite l’adresse indiquée dans la sortie de la commande, généralement `http://localhost:5000` ou `https://localhost:5001`. L’application nécessite une connexion valide à SQL Server.
+Ouvrez ensuite l’adresse indiquée dans la sortie de la commande, généralement `http://localhost:5000` ou `https://localhost:5001`. L’application nécessite une connexion valide à PostgreSQL.
+
+## Déploiement sur Railway
+
+Ajoutez au service web les variables suivantes, en liant les valeurs à votre service PostgreSQL :
+
+- `ConnectionStrings__AkarangaBank` : chaîne Npgsql, par exemple `Host=<host>;Port=5432;Database=<database>;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true`.
+- Préparez au préalable le schéma PostgreSQL et les tables ASP.NET Identity; les migrations conservées dans ce projet ciblent SQL Server.
 
 ## Structure du projet
 

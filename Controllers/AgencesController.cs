@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using AkarangaBank.Web.Services;
 using AkarangaBank.Web.ViewModels;
 
@@ -67,7 +67,7 @@ public async Task<IActionResult> Create(AgenceCreateViewModel vm)
          return RedirectToAction(nameof(Index));
 
       }
-      catch (DbUpdateException ex) when (ex.InnerException is SqlException sql && sql.Number == 2601){
+      catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgres && postgres.SqlState == PostgresErrorCodes.UniqueViolation){
          // Contrainte UNIQUE violÃ©e cÃ´tÃ© base
          ModelState.AddModelError(nameof(vm.Code), "Ce code d'agence est dÃ©jÃ  utilisÃ©.");
          return View(vm);
@@ -121,7 +121,7 @@ public async Task<IActionResult> Create(AgenceCreateViewModel vm)
          return RedirectToAction(nameof(Index));
       }
       catch (DbUpdateException ex)
-      when (ex.InnerException is SqlException sql && sql.Number == 2601)
+      when (ex.InnerException is PostgresException postgres && postgres.SqlState == PostgresErrorCodes.UniqueViolation)
       {
          ModelState.AddModelError(nameof(vm.Code),
          "Ce code d'agence est dÃ©jÃ  utilisÃ©.");

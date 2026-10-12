@@ -16,6 +16,13 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("AkarangaBank");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Database connection string is missing. Set ConnectionStrings__AkarangaBank to a PostgreSQL connection string.");
+}
+
 // --- Localisation (Chapitre 13) ---
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -45,8 +52,7 @@ builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddDbContext<AkarangaBankContext>((sp, options) => 
 { 
     var interceptor = sp.GetRequiredService<AuditInterceptor>(); 
-    options.UseSqlServer( 
-        builder.Configuration.GetConnectionString("AkarangaBank")) 
+    options.UseNpgsql(connectionString) 
         .AddInterceptors(interceptor); 
 });
 

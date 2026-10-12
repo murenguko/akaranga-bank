@@ -111,7 +111,7 @@ b.ToTable("UtilisateursTokens"));
             b.Property(a => a.Ville).HasMaxLength(50).IsRequired(); 
             b.Property(a => a.EstSiege).HasDefaultValue(false); 
             b.Property(a => 
-a.DateCreation).HasDefaultValueSql("SYSDATETIME()"); 
+a.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(a => a.Code).IsUnique(); 
         }); 
@@ -130,7 +130,7 @@ a.DateCreation).HasDefaultValueSql("SYSDATETIME()");
 
  
             b.Property(p => 
-p.DateModification).HasDefaultValueSql("SYSDATETIME()"); 
+p.DateModification).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(p => new { p.Cle, p.AgenceId }).IsUnique(); 
  
@@ -158,7 +158,7 @@ p.DateModification).HasDefaultValueSql("SYSDATETIME()");
             b.Property(c => 
 c.Statut).HasMaxLength(20).HasDefaultValue("Actif"); 
             b.Property(c => 
-c.DateCreation).HasDefaultValueSql("SYSDATETIME()"); 
+c.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(c => c.NumeroClient).IsUnique(); 
             b.HasIndex(c => c.NumeroCNI).IsUnique(); 
@@ -214,7 +214,7 @@ t.TauxInteret).HasColumnType("decimal(5,2)").HasDefaultValue(0m);
 t.SoldeMinimum).HasColumnType("decimal(18,2)").HasDefaultValue(0m); 
             b.Property(t => t.AutoriseDecouvert).HasDefaultValue(false); 
             b.Property(t => 
-t.DateCreation).HasDefaultValueSql("SYSDATETIME()"); 
+t.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(t => t.Code).IsUnique(); 
         }); 
@@ -237,9 +237,9 @@ c.Solde).HasColumnType("decimal(18,2)").HasDefaultValue(0m);
 c.Statut).HasMaxLength(20).HasDefaultValue("Actif");
             b.Property(c => c.EstCompteInterne).HasDefaultValue(false); 
             b.Property(c => 
-c.DateOuverture).HasDefaultValueSql("SYSDATETIME()"); 
+c.DateOuverture).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
             b.Property(c => 
-c.DateCreation).HasDefaultValueSql("SYSDATETIME()"); 
+c.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(c => c.NumeroCompte).IsUnique(); 
             b.HasIndex(c => c.ClientId); 
@@ -278,7 +278,7 @@ c.DateCreation).HasDefaultValueSql("SYSDATETIME()");
 c.Statut).HasMaxLength(20).HasDefaultValue("Active"); 
             b.Property(c => c.MotifOpposition).HasMaxLength(255);
             b.Property(c => 
-c.DateCreation).HasDefaultValueSql("SYSDATETIME()"); 
+c.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(c => c.NumeroCarte).IsUnique(); 
             b.HasIndex(c => c.CompteId); 
@@ -318,7 +318,7 @@ p.Mensualite).HasColumnType("decimal(18,2)").IsRequired();
             b.Property(p => 
 p.Statut).HasMaxLength(20).HasDefaultValue("EnAttente"); 
             b.Property(p => 
-p.DateDemande).HasDefaultValueSql("SYSDATETIME()"); 
+p.DateDemande).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(p => p.Reference).IsUnique(); 
             b.HasIndex(p => p.ClientId); 
@@ -387,7 +387,7 @@ v.Statut).HasMaxLength(20).HasDefaultValue("EnAttente");
 
  
             b.Property(v => 
-v.DateVirement).HasDefaultValueSql("SYSDATETIME()"); 
+v.DateVirement).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(v => v.Reference).IsUnique(); 
             b.HasIndex(v => v.CompteSourceId); 
@@ -428,9 +428,9 @@ o.Montant).HasColumnType("decimal(18,2)").IsRequired();
 o.Statut).HasMaxLength(20).HasDefaultValue("EnAttente"); 
             b.Property(o => o.Commentaire).HasMaxLength(255); 
             b.Property(o => 
-o.DateOperation).HasDefaultValueSql("SYSDATETIME()"); 
+o.DateOperation).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
             b.Property(o => 
-o.DateCreation).HasDefaultValueSql("SYSDATETIME()"); 
+o.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(o => o.Reference).IsUnique(); 
             b.HasIndex(o => o.CompteId); 
@@ -480,7 +480,7 @@ o.DateCreation).HasDefaultValueSql("SYSDATETIME()");
 e.Montant).HasColumnType("decimal(18,2)").IsRequired(); 
             b.Property(e => e.Devise).HasMaxLength(3).HasDefaultValue("BIF"); 
             b.Property(e => 
-e.DateEcriture).HasDefaultValueSql("SYSDATETIME()"); 
+e.DateEcriture).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
             b.Property(e => e.Libelle).HasMaxLength(255); 
  
             b.HasIndex(e => e.OperationId); 
@@ -508,14 +508,14 @@ e.DateEcriture).HasDefaultValueSql("SYSDATETIME()");
             b.HasKey(a => a.Id); 
  
             b.Property(a => 
-a.DateEvenement).HasDefaultValueSql("SYSDATETIME()"); 
+a.DateEvenement).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
             b.Property(a => a.Action).HasMaxLength(50).IsRequired(); 
             b.Property(a => a.TableConcernee).HasMaxLength(50); 
-            b.Property(a => a.ValeurAvant).HasColumnType("nvarchar(max)"); 
-            b.Property(a => a.ValeurApres).HasColumnType("nvarchar(max)"); 
+            b.Property(a => a.ValeurAvant).HasColumnType("text"); 
+            b.Property(a => a.ValeurApres).HasColumnType("text"); 
             b.Property(a => a.AdresseIP).HasMaxLength(45); 
             b.Property(a => a.UserAgent).HasMaxLength(255); 
-            b.Property(a => a.Details).HasColumnType("nvarchar(max)"); 
+            b.Property(a => a.Details).HasColumnType("text"); 
  
             b.HasIndex(a => a.DateEvenement); 
             b.HasIndex(a => a.UtilisateurId); 
@@ -546,7 +546,7 @@ a.DateEvenement).HasDefaultValueSql("SYSDATETIME()");
             b.Property(a => a.Description).HasMaxLength(500); 
             b.Property(a => 
 a.Statut).HasMaxLength(20).HasDefaultValue("Ouverte"); 
-            b.Property(a => a.DateAlerte).HasDefaultValueSql("SYSDATETIME()"); 
+            b.Property(a => a.DateAlerte).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
  
             b.HasIndex(a => a.Statut); 
             b.HasIndex(a => a.ClientId); 
@@ -580,7 +580,7 @@ a.Statut).HasMaxLength(20).HasDefaultValue("Ouverte");
             b.Property(s => s.UserAgent).HasMaxLength(255); 
             b.Property(s => s.DeuxFA_Valide).HasDefaultValue(false); 
             b.Property(s => 
-s.DateConnexion).HasDefaultValueSql("SYSDATETIME()"); 
+s.DateConnexion).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
             b.Property(s => s.EstActive).HasDefaultValue(true); 
  
             b.HasIndex(s => s.Token).IsUnique(); 
@@ -630,7 +630,7 @@ s.DateConnexion).HasDefaultValueSql("SYSDATETIME()");
             b.HasKey(d => d.Id);
             b.Property(d => d.Reference).HasMaxLength(30).IsRequired();
             b.Property(d => d.TypeDeclaration).HasMaxLength(10).IsRequired();
-            b.Property(d => d.Contenu).HasColumnType("nvarchar(max)").IsRequired();
+            b.Property(d => d.Contenu).HasColumnType("text").IsRequired();
             b.Property(d => d.MotifSuspicion).HasMaxLength(1000);
             b.Property(d => d.Statut).HasMaxLength(20).HasDefaultValue("Brouillon");
             b.Property(d => d.ReponseCNRF).HasMaxLength(1000);
@@ -690,7 +690,7 @@ s.DateConnexion).HasDefaultValueSql("SYSDATETIME()");
             b.Property(d => d.HashSha256).HasMaxLength(64).IsRequired();
             b.Property(d => d.CheminFichier).HasMaxLength(500).IsRequired();
             b.Property(d => d.Statut).HasMaxLength(20).HasDefaultValue("Actif");
-            b.Property(d => d.DateCreation).HasDefaultValueSql("SYSDATETIME()");
+            b.Property(d => d.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             b.HasOne(d => d.Client)
                 .WithMany()
@@ -718,7 +718,7 @@ s.DateConnexion).HasDefaultValueSql("SYSDATETIME()");
             b.ToTable("DocumentAcces");
             b.HasKey(da => da.Id);
             b.Property(da => da.TypeAction).HasMaxLength(50).IsRequired();
-            b.Property(da => da.DateAcces).HasDefaultValueSql("SYSDATETIME()");
+            b.Property(da => da.DateAcces).HasDefaultValueSql("CURRENT_TIMESTAMP");
             b.Property(da => da.AdresseIP).HasMaxLength(45);
             b.Property(da => da.UserAgent).HasMaxLength(255);
 
@@ -743,9 +743,9 @@ s.DateConnexion).HasDefaultValueSql("SYSDATETIME()");
             b.Property(nt => nt.TypeNotification).HasMaxLength(20).IsRequired();
             b.Property(nt => nt.Langue).HasMaxLength(10).IsRequired();
             b.Property(nt => nt.Sujet).HasMaxLength(255).IsRequired();
-            b.Property(nt => nt.ContenuHtml).HasColumnType("nvarchar(max)");
-            b.Property(nt => nt.ContenuTexte).HasColumnType("nvarchar(max)");
-            b.Property(nt => nt.DateCreation).HasDefaultValueSql("SYSDATETIME()");
+            b.Property(nt => nt.ContenuHtml).HasColumnType("text");
+            b.Property(nt => nt.ContenuTexte).HasColumnType("text");
+            b.Property(nt => nt.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             b.HasIndex(nt => new { nt.Code, nt.TypeNotification, nt.Langue }).IsUnique();
         });
@@ -761,9 +761,9 @@ s.DateConnexion).HasDefaultValueSql("SYSDATETIME()");
             b.Property(n => n.Destinataire).HasMaxLength(255).IsRequired();
             b.Property(n => n.TypeNotification).HasMaxLength(20).IsRequired();
             b.Property(n => n.Sujet).HasMaxLength(255).IsRequired();
-            b.Property(n => n.Message).HasColumnType("nvarchar(max)").IsRequired();
+            b.Property(n => n.Message).HasColumnType("text").IsRequired();
             b.Property(n => n.Statut).HasMaxLength(20).HasDefaultValue("EnAttente");
-            b.Property(n => n.DateCreation).HasDefaultValueSql("SYSDATETIME()");
+            b.Property(n => n.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             b.HasOne(n => n.Client)
                 .WithMany()
