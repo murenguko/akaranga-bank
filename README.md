@@ -43,6 +43,30 @@ Ajoutez au service web la variable suivante, en liant les valeurs à votre servi
 
 L’application ne crée pas de tables et ne peuple pas la base au démarrage. Les fonctionnalités Identity exigent les tables correspondantes, notamment `Roles`.
 
+### Raccorder la base déjà peuplée par le script PostgreSQL
+
+Le script initial crée des noms non cités, donc PostgreSQL les stocke en minuscules (`utilisateurs`, `agences`, etc.). L'application utilise les noms cités et les colonnes d'ASP.NET Identity. Exécutez une seule fois `Railway-PostgreSQL-Bridge.sql` dans **la base à laquelle le service Web se connecte**. Le script crée les tables de l'application, copie les données avec les mêmes identifiants et laisse les tables d'origine intactes. Il s'arrête si les tables d'origine manquent ou si les tables de l'application existent déjà. Faites une sauvegarde avant l'exécution.
+
+Dans PowerShell, avec une URL de connexion publique à cette base enregistrée dans une variable d'environnement locale :
+
+```powershell
+psql "$env:RAILWAY_POSTGRES_URL" -v ON_ERROR_STOP=1 -f .\Railway-PostgreSQL-Bridge.sql
+```
+
+Le script affiche les nombres de lignes copiées après le commit. Vérifiez que chaque paire est identique. Après cette copie, l'application écrit dans les nouvelles tables aux noms cités ; les anciennes tables ne sont plus synchronisées. Les mots de passe factices du script initial ne sont pas des hachages ASP.NET Identity utilisables. Les utilisateurs importés restent inactifs jusqu'à la définition d'un nouveau mot de passe. Leurs adresses reprennent `username` quand celui-ci est déjà une adresse ; autrement, le script ajoute `@akaranga.bi`. Vérifiez ces adresses :
+
+```sql
+SELECT "Id", "Email", "Role", "EstActif" FROM "Utilisateurs" ORDER BY "Id";
+```
+
+Pour activer un compte, générez localement une commande SQL avec un mot de passe choisi par vous. Le mot de passe est saisi sans affichage et n'apparaît pas dans la commande PowerShell :
+
+```powershell
+dotnet run --project tools/IdentityPasswordSql -- admin_bjm@akaranga.bi
+```
+
+Exécutez ensuite le `UPDATE` affiché dans la même base Railway. Répétez pour les comptes nécessaires. Si l'adresse doit changer, corrigez `"UserName"`, `"NormalizedUserName"`, `"Email"` et `"NormalizedEmail"` ensemble avant d'utiliser l'outil.
+
 ## Structure du projet
 
 | Dossier ou fichier | Rôle |
@@ -66,7 +90,7 @@ L’application ne crée pas de tables et ne peuple pas la base au démarrage. L
 
 - C# et ASP.NET Core MVC avec Razor Pages.
 - .NET 10 et ASP.NET Core Identity.
-- Entity Framework Core et SQL Server.
+- Entity Framework Core et PostgreSQL.
 - SignalR pour les notifications en temps réel.
 - Hangfire pour les tâches d’arrière-plan.
 - QuestPDF, ClosedXML et CsvHelper pour les documents et exports.

@@ -466,35 +466,35 @@ GO
 -- Ici, valeurs fictives pour les tests.
 INSERT INTO utilisateurs (username, password_hash, role, agence_code, statut) VALUES
 (
-    'admin_bjm', 
+    'admin_bjm@akaranga.bi', 
     '$2b$12$K8N7vX8pY3qZ2wL5mN1oP.u8V5xT3rQ9sW1eR4tY7uI0oP3aS6dFf', -- Mot de passe en clair : Admin2026!
     'Administrateur', 
     'AKR-BJM', 
     'ACTIF'
 ),
 (
-    'gestionnaire_bjm', 
+    'gestionnaire_bjm@akaranga.bi', 
     '$2b$12$M3nB5vC7xZ9lK1jH4gF6d.s8A2pL0oI9uY7tR5eW3qQ1aZ4sXdFcV', -- Mot de passe en clair : Gest2026!
     'Gestionnaire', 
     'AKR-BJM', 
     'ACTIF'
 ),
 (
-    'auditeur_bjm', 
+    'auditeur_bjm@akaranga.bi', 
     '$2b$12$X9zC2vB5nM8lK4jH1gF7d.s3A6pL9oI2uY5tR8eW1qQ4aZ7sXdFcVt', -- Mot de passe en clair : Audit2026!
     'Auditeur', 
     'AKR-BJM', 
     'ACTIF'
 ),
 (
-    'guichetier_git', 
+    'guichetier_git@akaranga.bi', 
     '$2b$12$Q1wE3rT5yU7iO9pA2sD4f.g6H8jK0lL3zX5cV7bN9mM2qW4eR6tY8uI', -- Mot de passe en clair : GuichGit2026!
     'Guichetier', 
     'AKR-GIT', 
     'ACTIF'
 ),
 (
-    'guichetier_ngo', 
+    'guichetier_ngo@akaranga.bi', 
     '$2b$12$Z3xX5cV7bN9mM2qW4eR6t.y8U0iO2pA4sD6fG8hJ0kL1zX3cV5bN7mM', -- Mot de passe en clair : GuichNgo2026!
     'Guichetier', 
     'AKR-NGO', 

@@ -151,6 +151,7 @@ p.DateModification).HasDefaultValueSql("CURRENT_TIMESTAMP");
             b.Property(c => c.NumeroClient).HasMaxLength(20).IsRequired(); 
             b.Property(c => c.Nom).HasMaxLength(100).IsRequired(); 
             b.Property(c => c.Prenom).HasMaxLength(100).IsRequired(); 
+            b.Property(c => c.DateNaissance).HasColumnType("date");
             b.Property(c => c.NumeroCNI).HasMaxLength(30).IsRequired(); 
             b.Property(c => c.Telephone).HasMaxLength(20); 
             b.Property(c => c.Email).HasMaxLength(100); 
@@ -270,6 +271,7 @@ c.DateCreation).HasDefaultValueSql("CURRENT_TIMESTAMP");
  
             b.Property(c => c.NumeroCarte).HasMaxLength(20).IsRequired(); 
             b.Property(c => c.NumeroMasque).HasMaxLength(25).IsRequired();
+            b.Property(c => c.DateExpiration).HasColumnType("date");
             b.Property(c => c.TypeCarte).HasMaxLength(20).IsRequired(); 
             b.Property(c => c.PlafondRetrait).HasColumnType("decimal(18,2)").HasDefaultValue(500000m);
             b.Property(c => c.PlafondPaiement).HasColumnType("decimal(18,2)").HasDefaultValue(1000000m);
@@ -416,7 +418,7 @@ v.DateVirement).HasDefaultValueSql("CURRENT_TIMESTAMP");
         modelBuilder.Entity<Operation>(b => 
         { 
             b.ToTable("Operations");
-            b.ToTable(t => t.HasCheckConstraint("CK_Operations_Type", "[TypeOperation] IN ('Depot', 'Retrait', 'Virement', 'VirementInterAgence', 'ReglementCompensation', 'DeblocagePret', 'RemboursementPret', 'Frais', 'Interet', 'PaiementCarte', 'RetraitCarte')")); 
+            b.ToTable(t => t.HasCheckConstraint("CK_Operations_Type", "\"TypeOperation\" IN ('Depot', 'Retrait', 'Virement', 'VirementInterAgence', 'ReglementCompensation', 'DeblocagePret', 'RemboursementPret', 'Frais', 'Interet', 'PaiementCarte', 'RetraitCarte')"));
             b.HasKey(o => o.Id); 
  
             b.Property(o => o.Reference).HasMaxLength(30).IsRequired(); 
