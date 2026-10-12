@@ -22,7 +22,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_HTTP_PORTS: 8080
-      Database__MigrateOnStartup: "false"
       ConnectionStrings__AkarangaBank: "Host=db;Port=5432;Database=${POSTGRES_DB:-akarangabank};Username=${POSTGRES_USER:-akaranga_app};Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
     depends_on:
       db:

@@ -23,7 +23,7 @@ Application web de gestion bancaire réalisée avec ASP.NET Core. Elle regroupe 
 
    Adaptez l’hôte, la base, l’utilisateur et le mot de passe à votre installation PostgreSQL. Les paramètres SMTP, Twilio et Firebase sont facultatifs et peuvent être configurés de la même manière selon les fonctionnalités utilisées.
 
-4. Créez la base et préparez son schéma ainsi que les tables ASP.NET Identity avant de démarrer l’application. Les anciens scripts et migrations SQL Server ne sont pas compatibles avec PostgreSQL.
+4. Préparez la base PostgreSQL avec les tables nécessaires aux fonctionnalités utilisées. Le script `AkarangaBank-Script-DB-PostgreSQL.sql` contient les données métier de référence, mais ne crée pas la table Identity `Roles`.
 
 ## Lancement
 
@@ -37,10 +37,11 @@ Ouvrez ensuite l’adresse indiquée dans la sortie de la commande, généraleme
 
 ## Déploiement sur Railway
 
-Ajoutez au service web les variables suivantes, en liant les valeurs à votre service PostgreSQL :
+Ajoutez au service web la variable suivante, en liant les valeurs à votre service PostgreSQL :
 
-- `ConnectionStrings__AkarangaBank` : chaîne Npgsql, par exemple `Host=<host>;Port=5432;Database=<database>;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true`.
-- Préparez au préalable le schéma PostgreSQL et les tables ASP.NET Identity; les migrations conservées dans ce projet ciblent SQL Server.
+- `ConnectionStrings__AkarangaBank` : `Host=${{Postgres.PGHOST}};Port=${{Postgres.PGPORT}};Database=${{Postgres.PGDATABASE}};Username=${{Postgres.PGUSER}};Password=${{Postgres.PGPASSWORD}}` (adaptez `Postgres` au nom du service).
+
+L’application ne crée pas de tables et ne peuple pas la base au démarrage. Les fonctionnalités Identity exigent les tables correspondantes, notamment `Roles`.
 
 ## Structure du projet
 
@@ -73,18 +74,18 @@ Ajoutez au service web les variables suivantes, en liant les valeurs à votre se
 
 ## DÃ©ploiement avec Docker Compose
 
-Le conteneur Web utilise .NET 10, Ã©coute sur le port `8080` et s'exÃ©cute sans privilÃ¨ges root. SQL Server reste sur le rÃ©seau Docker interne. Les donnÃ©es SQL et les documents tÃ©lÃ©versÃ©s sont conservÃ©s dans des volumes Docker.
+Le conteneur Web utilise .NET 10, Ã©coute sur le port `8080` et s'exÃ©cute sans privilÃ¨ges root. PostgreSQL reste sur le rÃ©seau Docker interne. Les donnÃ©es PostgreSQL et les documents tÃ©lÃ©versÃ©s sont conservÃ©s dans des volumes Docker.
 
-1. Copiez `.env.example` vers `.env` et remplacez `MSSQL_SA_PASSWORD` par un mot de passe fort et unique. Ne publiez pas le fichier `.env`.
+1. Copiez `.env.example` vers `.env` et remplacez `POSTGRES_PASSWORD` par un mot de passe fort et unique. Ne publiez pas le fichier `.env`.
 2. Construisez et dÃ©marrez les services :
 
    ```sh
    docker compose up --build -d
    ```
 
-L'application est disponible sur le port `8080` de l'hÃ´te. En production, placez-la derriÃ¨re un proxy inverse qui termine TLS. ProtÃ©gez et sauvegardez les volumes `mssql_data` et `document_data`; un volume Docker seul n'est pas une sauvegarde.
+L'application est disponible sur le port `8080` de l'hÃ´te. En production, placez-la derriÃ¨re un proxy inverse qui termine TLS. ProtÃ©gez et sauvegardez les volumes `postgres_data` et `document_data`; un volume Docker seul n'est pas une sauvegarde.
 
-Compose active l'application automatique des migrations Entity Framework au dÃ©marrage, avant l'initialisation des donnÃ©es. Utilisez une seule instance Web pour exÃ©cuter les migrations lors des dÃ©ploiements.
+Compose ne lance ni migration ni initialisation des données au démarrage. Préparez la base avant de démarrer le service Web.
 
 ## Licence
 

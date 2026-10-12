@@ -197,18 +197,6 @@ builder.Services.AddRazorPages(options =>
 
 var app = builder.Build();
 
-// --- Initialisation (Rôles + Admin Système) --- 
-using (var scope = app.Services.CreateScope()) 
-{ 
-    if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
-    {
-        var dbContext = scope.ServiceProvider.GetRequiredService<AkarangaBankContext>();
-        await dbContext.Database.MigrateAsync();
-    }
-
-    await AdminInitializer.InitializeAsync(scope.ServiceProvider, app.Environment.IsDevelopment()); 
-}
-
 // Pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
