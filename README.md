@@ -67,6 +67,8 @@ dotnet run --project tools/IdentityPasswordSql -- admin_bjm@akaranga.bi
 
 Exécutez ensuite le `UPDATE` affiché dans la même base Railway. Répétez pour les comptes nécessaires. Si l'adresse doit changer, corrigez `"UserName"`, `"NormalizedUserName"`, `"Email"` et `"NormalizedEmail"` ensemble avant d'utiliser l'outil.
 
+Pour activer les cinq comptes de démonstration avec les mots de passe indiqués en commentaire dans le script d'origine, exécutez plutôt `Railway-PostgreSQL-Set-Legacy-Passwords.sql` après le bridge. Cette commande remplace tout mot de passe déjà défini pour ces comptes. Les mots de passe de démonstration figurent dans le dépôt : changez-les après la connexion.
+
 ## Structure du projet
 
 | Dossier ou fichier | Rôle |

@@ -77,4 +77,5 @@
   <data name="Kiswahili"><value>Kiswahili</value></data>
   <data name="TableCaptionPrefix"><value>Table: </value></data>
   <data name="ToggleNavigation"><value>Toggle navigation menu</value></data>
+  <data name="CreateAccount"><value>Create account</value></data>
 </root>

@@ -25,10 +25,13 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 // --- Localisation (Chapitre 13) ---
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+var frenchCulture = new CultureInfo("fr-BI");
+CultureInfo.DefaultThreadCurrentCulture = frenchCulture;
+CultureInfo.DefaultThreadCurrentUICulture = frenchCulture;
+
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    var frenchCulture = new CultureInfo("fr-BI");
-    options.DefaultRequestCulture = new RequestCulture("fr-BI");
+    options.DefaultRequestCulture = new RequestCulture(frenchCulture);
     options.SupportedCultures = new[] { frenchCulture };
     options.SupportedUICultures = new[] { frenchCulture };
     options.RequestCultureProviders.Clear();

@@ -53,6 +53,7 @@
   <data name="Reporting" xml:space="preserve"><value>Rapports &amp; États</value></data>
   <data name="Users" xml:space="preserve"><value>Utilisateurs</value></data>
   <data name="Login" xml:space="preserve"><value>Connexion</value></data>
+  <data name="CreateAccount" xml:space="preserve"><value>Créer un compte</value></data>
   <data name="Logout" xml:space="preserve"><value>Déconnexion</value></data>
   <data name="MyAccount" xml:space="preserve"><value>Mon compte</value></data>
   <data name="Balance" xml:space="preserve"><value>Solde</value></data>
