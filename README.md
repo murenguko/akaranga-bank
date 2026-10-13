@@ -69,6 +69,20 @@ Exécutez ensuite le `UPDATE` affiché dans la même base Railway. Répétez pou
 
 Pour activer les cinq comptes de démonstration avec les mots de passe indiqués en commentaire dans le script d'origine, exécutez plutôt `Railway-PostgreSQL-Set-Legacy-Passwords.sql` après le bridge. Cette commande remplace tout mot de passe déjà défini pour ces comptes. Les mots de passe de démonstration figurent dans le dépôt : changez-les après la connexion.
 
+### Comptes de démonstration
+
+Utilisez ces comptes pour tester les différents rôles :
+
+| Rôle | Adresse e-mail | Mot de passe |
+| --- | --- | --- |
+| Administrateur (`admin`) | `admin_bjm@akaranga.bi` | `Admin2026!` |
+| Gestionnaire (`gestionnaire`) | `gestionnaire_bjm@akaranga.bi` | `Gest2026!` |
+| Auditeur (`auditeur`) | `auditeur_bjm@akaranga.bi` | `Audit2026!` |
+| Guichetier — Gitega (`guichetier`) | `guichetier_git@akaranga.bi` | `GuichGit2026!` |
+| Guichetier — Ngozi (`guichetier`) | `guichetier_ngo@akaranga.bi` | `GuichNgo2026!` |
+
+
+
 ## Structure du projet
 
 | Dossier ou fichier | Rôle |
