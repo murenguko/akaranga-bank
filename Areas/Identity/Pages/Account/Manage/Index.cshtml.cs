@@ -6,10 +6,12 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AkarangaBank.Web.Data;
 using AkarangaBank.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace AkarangaBank.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -17,13 +19,16 @@ namespace AkarangaBank.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AkarangaBankContext _context;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            AkarangaBankContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         /// <summary>
@@ -31,6 +36,7 @@ namespace AkarangaBank.Web.Areas.Identity.Pages.Account.Manage
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public string Username { get; set; }
+        public string AgenceName { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -67,6 +73,9 @@ namespace AkarangaBank.Web.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+            var agence = await _context.Agences.AsNoTracking()
+                .SingleOrDefaultAsync(a => a.Id == user.AgenceId);
+            AgenceName = agence is null ? "Non renseignée" : $"{agence.Nom} — {agence.Ville}";
 
             Input = new InputModel
             {

@@ -98,18 +98,18 @@ Pour activer les cinq comptes de démonstration avec les mots de passe indiqués
 - QuestPDF, ClosedXML et CsvHelper pour les documents et exports.
 - MailKit, Twilio et Firebase pour les intégrations de notification.
 
-## DÃ©ploiement avec Docker Compose
+## Déploiement avec Docker Compose
 
-Le conteneur Web utilise .NET 10, Ã©coute sur le port `8080` et s'exÃ©cute sans privilÃ¨ges root. PostgreSQL reste sur le rÃ©seau Docker interne. Les donnÃ©es PostgreSQL et les documents tÃ©lÃ©versÃ©s sont conservÃ©s dans des volumes Docker.
+Le conteneur Web utilise .NET 10, écoute sur le port `8080` et s'exécute sans privilèges root. PostgreSQL reste sur le réseau Docker interne. Les données PostgreSQL et les documents téléversés sont conservés dans des volumes Docker.
 
 1. Copiez `.env.example` vers `.env` et remplacez `POSTGRES_PASSWORD` par un mot de passe fort et unique. Ne publiez pas le fichier `.env`.
-2. Construisez et dÃ©marrez les services :
+2. Construisez et démarrez les services :
 
    ```sh
    docker compose up --build -d
    ```
 
-L'application est disponible sur le port `8080` de l'hÃ´te. En production, placez-la derriÃ¨re un proxy inverse qui termine TLS. ProtÃ©gez et sauvegardez les volumes `postgres_data` et `document_data`; un volume Docker seul n'est pas une sauvegarde.
+L'application est disponible sur le port `8080` de l'hôte. En production, placez-la derrière un proxy inverse qui termine TLS. Protégez et sauvegardez les volumes `postgres_data` et `document_data`; un volume Docker seul n'est pas une sauvegarde.
 
 Compose ne lance ni migration ni initialisation des données au démarrage. Préparez la base avant de démarrer le service Web.
 

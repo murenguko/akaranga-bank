@@ -24,7 +24,10 @@ if (string.IsNullOrWhiteSpace(connectionString))
 }
 
 // --- Localisation (Chapitre 13) ---
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+// SharedResource already lives in the AkarangaBank.Web.Resources namespace,
+// which matches the Resources/SharedResource.*.resx files. Setting
+// ResourcesPath here would add "Resources" a second time and prevent lookup.
+builder.Services.AddLocalization();
 var frenchCulture = new CultureInfo("fr-BI");
 CultureInfo.DefaultThreadCurrentCulture = frenchCulture;
 CultureInfo.DefaultThreadCurrentUICulture = frenchCulture;

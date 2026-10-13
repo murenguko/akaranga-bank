@@ -2,12 +2,12 @@
 @model EnableAuthenticatorModel
 @inject AkarangaBank.Web.Services.IQrCodeService QrCodeService
 @{
-    ViewData["Title"] = "Set up authenticator app";
+    ViewData["Title"] = "Configurer l’application d’authentification";
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
 <h1>@ViewData["Title"]</h1>
-<p>Scan this QR code with your authenticator app, or enter the setup key manually.</p>
+<p>Scannez ce code QR avec votre application d’authentification ou saisissez la clé de configuration manuellement.</p>
 
 <div class="row">
     <div class="col-md-6">
@@ -26,7 +26,7 @@
                 <span asp-validation-for="Input.Code" class="text-danger"></span>
             </div>
             <button type="submit" class="btn btn-primary">Verify and enable two-factor authentication</button>
-            <a asp-page="./TwoFactorAuthentication" class="btn btn-secondary">Cancel</a>
+            <a asp-page="./TwoFactorAuthentication" class="btn btn-secondary">Annuler</a>
         </form>
     </div>
 </div>

@@ -52,24 +52,24 @@ public async Task<IActionResult> Create(AgenceCreateViewModel vm)
    {
       if (!ModelState.IsValid) return View(vm);
 
-      // VÃ©rification d'unicitÃ© du code
+      // Vérification d'unicité du code
 
       if (await _agenceService.CodeExisteAsync(vm.Code.Trim().ToUpperInvariant()))
       {
-         ModelState.AddModelError(nameof(vm.Code), "Ce code d'agence est dÃ©jÃ  utilisÃ©. ");
+         ModelState.AddModelError(nameof(vm.Code), "Ce code d'agence est déjà utilisé. ");
          return View(vm);
       }
 
       try
       {
          await _agenceService.CreateAsync(vm);
-         TempData["Success"] = "Agence crÃ©Ã©e avec succÃ¨s.";
+         TempData["Success"] = "Agence créée avec succès.";
          return RedirectToAction(nameof(Index));
 
       }
       catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgres && postgres.SqlState == PostgresErrorCodes.UniqueViolation){
-         // Contrainte UNIQUE violÃ©e cÃ´tÃ© base
-         ModelState.AddModelError(nameof(vm.Code), "Ce code d'agence est dÃ©jÃ  utilisÃ©.");
+         // Contrainte UNIQUE violée côté base
+         ModelState.AddModelError(nameof(vm.Code), "Ce code d'agence est déjà utilisé.");
          return View(vm);
       }
 
@@ -110,21 +110,21 @@ public async Task<IActionResult> Create(AgenceCreateViewModel vm)
       if (await _agenceService.CodeExisteAsync(vm.Code.Trim().ToUpperInvariant(), vm.Id))
       {
       ModelState.AddModelError(nameof(vm.Code),
-      "Ce code d'agence est dÃ©jÃ  utilisÃ©.");
+      "Ce code d'agence est déjà utilisé.");
       return View(vm);
       }
       try
       {
          var ok = await _agenceService.UpdateAsync(vm);
          if (!ok) return NotFound();
-         TempData["Success"] = "Agence modifiÃ©e avec succÃ¨s.";
+         TempData["Success"] = "Agence modifiée avec succès.";
          return RedirectToAction(nameof(Index));
       }
       catch (DbUpdateException ex)
       when (ex.InnerException is PostgresException postgres && postgres.SqlState == PostgresErrorCodes.UniqueViolation)
       {
          ModelState.AddModelError(nameof(vm.Code),
-         "Ce code d'agence est dÃ©jÃ  utilisÃ©.");
+         "Ce code d'agence est déjà utilisé.");
          return View(vm);
       }
  }
@@ -154,7 +154,7 @@ public async Task<IActionResult> Create(AgenceCreateViewModel vm)
  {
  var ok = await _agenceService.DeleteAsync(id);
  if (!ok) return NotFound();
- TempData["Success"] = "Agence supprimÃ©e avec succÃ¨s.";
+ TempData["Success"] = "Agence supprimée avec succès.";
  return RedirectToAction(nameof(Index));
  }
  catch (InvalidOperationException ex)
