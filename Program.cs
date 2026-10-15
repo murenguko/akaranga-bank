@@ -178,6 +178,9 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("GuichetierOnly", policy =>
         policy.RequireRole("guichetier", "gestionnaire", "admin")); 
+
+    options.AddPolicy("OperationsJournalReaders", policy =>
+        policy.RequireRole("admin", "gestionnaire", "guichetier", "auditeur"));
 });
 
 // --- Protection globale --- 
